@@ -50,5 +50,5 @@ public class MarketPlaceItem {
 
     @OneToMany(mappedBy = "marketPlaceItem", cascade = CascadeType.ALL)
     @JsonIgnore
-    private Set<Order> orders;
+    private Set<Orders> orders;
 }

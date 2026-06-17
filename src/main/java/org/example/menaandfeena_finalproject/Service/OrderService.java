@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.menaandfeena_finalproject.Api.ApiException;
 import org.example.menaandfeena_finalproject.DTO.In.OrderInDTO;
 import org.example.menaandfeena_finalproject.DTO.Out.OrderOutDTO;
-import org.example.menaandfeena_finalproject.Model.Order;
+import org.example.menaandfeena_finalproject.Model.Orders;
 import org.example.menaandfeena_finalproject.Repository.OrderRepository;
 import org.springframework.stereotype.Service;
 
@@ -20,51 +20,51 @@ public class OrderService {
     public List<OrderOutDTO> getAllOrders() {
         List<OrderOutDTO> orderOutDTOS = new ArrayList<>();
 
-        for (Order order : orderRepository.findAll()) {
-            orderOutDTOS.add(toOutDTO(order));
+        for (Orders orders : orderRepository.findAll()) {
+            orderOutDTOS.add(toOutDTO(orders));
         }
 
         return orderOutDTOS;
     }
 
     public void addOrder(OrderInDTO orderInDTO) {
-        Order order = new Order();
-        order.setType(orderInDTO.getType());
-        order.setStatus(orderInDTO.getStatus());
-        order.setTotalAmount(orderInDTO.getTotalAmount());
-        order.setStartDate(orderInDTO.getStartDate());
-        order.setEndDate(orderInDTO.getEndDate());
+        Orders orders = new Orders();
+        orders.setType(orderInDTO.getType());
+        orders.setStatus(orderInDTO.getStatus());
+        orders.setTotalAmount(orderInDTO.getTotalAmount());
+        orders.setStartDate(orderInDTO.getStartDate());
+        orders.setEndDate(orderInDTO.getEndDate());
 
-        orderRepository.save(order);
+        orderRepository.save(orders);
     }
 
     public void updateOrder(Integer id, OrderInDTO orderInDTO) {
-        Order oldOrder = orderRepository.findOrderById(id);
+        Orders oldOrders = orderRepository.findOrderById(id);
 
-        if (oldOrder == null) {
+        if (oldOrders == null) {
             throw new ApiException("Order not found");
         }
 
-        oldOrder.setType(orderInDTO.getType());
-        oldOrder.setStatus(orderInDTO.getStatus());
-        oldOrder.setTotalAmount(orderInDTO.getTotalAmount());
-        oldOrder.setStartDate(orderInDTO.getStartDate());
-        oldOrder.setEndDate(orderInDTO.getEndDate());
+        oldOrders.setType(orderInDTO.getType());
+        oldOrders.setStatus(orderInDTO.getStatus());
+        oldOrders.setTotalAmount(orderInDTO.getTotalAmount());
+        oldOrders.setStartDate(orderInDTO.getStartDate());
+        oldOrders.setEndDate(orderInDTO.getEndDate());
 
-        orderRepository.save(oldOrder);
+        orderRepository.save(oldOrders);
     }
 
     public void deleteOrder(Integer id) {
-        Order order = orderRepository.findOrderById(id);
+        Orders orders = orderRepository.findOrderById(id);
 
-        if (order == null) {
+        if (orders == null) {
             throw new ApiException("Order not found");
         }
 
-        orderRepository.delete(order);
+        orderRepository.delete(orders);
     }
 
-    private OrderOutDTO toOutDTO(Order order) {
-        return new OrderOutDTO(order.getId(), order.getType(), order.getStatus(), order.getTotalAmount(), order.getStartDate(), order.getEndDate());
+    private OrderOutDTO toOutDTO(Orders orders) {
+        return new OrderOutDTO(orders.getId(), orders.getType(), orders.getStatus(), orders.getTotalAmount(), orders.getStartDate(), orders.getEndDate());
     }
 }

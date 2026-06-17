@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @Entity
 @NoArgsConstructor
 @Setter @Getter
-public class Order {
+public class Orders {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -42,9 +42,9 @@ public class Order {
     private User user;
     */
 
-    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "orders", cascade = CascadeType.ALL)
     private Payment payment;
 
-    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "orders", cascade = CascadeType.ALL)
     private Insurance insurance;
 }

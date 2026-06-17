@@ -31,5 +31,5 @@ public class Payment {
 
     @OneToOne
     @JoinColumn(name = "order_id", referencedColumnName = "id")
-    private Order order;
+    private Orders orders;
 }
