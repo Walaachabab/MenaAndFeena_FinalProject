@@ -1,5 +1,6 @@
 package org.example.menaandfeena_finalproject.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -38,6 +39,7 @@ public class Neighborhood {
 
     // ربط علاقة الحي بالمستخدمين
     @OneToMany(mappedBy = "neighborhood", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<User> residents;
 
     // ربط علاقة الحي بالمعالم السكنية

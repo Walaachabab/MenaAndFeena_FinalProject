@@ -37,17 +37,17 @@ public class Review {
     @Max(value = 5, message = "Rating must be at most 5")
     private Integer rating;
 
-//    @ManyToOne
-//    @JoinColumn(name = "user_id")
-//    private User user;
-//
-//    @ManyToOne
-//    @JoinColumn(name = "event_id")
-//    private Event event;
-//
-//    @ManyToOne
-//    @JoinColumn(name = "initiative_id")
-//    private Initiative initiative;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "event_id")
+    private Event event;
+
+    @ManyToOne
+    @JoinColumn(name = "initiative_id")
+    private Initiative initiative;
 
 
 

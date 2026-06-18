@@ -1,5 +1,6 @@
 package org.example.menaandfeena_finalproject.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -68,7 +69,20 @@ public class User {
 
     // علاقة البلاغات المرفوعة (One User to Many Issue Reports)
     @OneToMany(mappedBy = "reporter", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<IssueReport> issueReports;
+
+    @OneToMany(mappedBy = "requester", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Inquiry> requestedInquiries;
+
+    @OneToMany(mappedBy = "targetUser", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Inquiry> receivedInquiries;
+
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<InquiryMessage> inquiryMessages;
 
     // دالة احتساب العمر تلقائياً في الجافا من تاريخ الميلاد
     public Integer getAge() {

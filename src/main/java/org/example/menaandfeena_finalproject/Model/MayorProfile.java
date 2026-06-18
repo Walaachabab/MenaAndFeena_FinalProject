@@ -33,13 +33,13 @@ public class MayorProfile {
     @NotNull(message = "End date cannot be null")
     private LocalDate endDate;
 
-//    @OneToOne
-//    @JoinColumn(name = "user_id")
-//    private User user;
-//
-//    @OneToOne
-//    @JoinColumn(name = "neighborhood_id")
-//    private Neighborhood neighborhood;
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @OneToOne
+    @JoinColumn(name = "neighborhood_id")
+    private Neighborhood neighborhood;
 
 
 

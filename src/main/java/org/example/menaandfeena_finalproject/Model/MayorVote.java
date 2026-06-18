@@ -18,11 +18,11 @@ public class MayorVote {
     @Column(columnDefinition = "datetime not null")
     private LocalDateTime createdAt;
 
-    /*
+
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
-    */
+
 
     @ManyToOne
     @JoinColumn(name = "mayor_candidate_id", referencedColumnName = "id")

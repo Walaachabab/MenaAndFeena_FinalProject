@@ -1,6 +1,7 @@
 package org.example.menaandfeena_finalproject.Model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -41,11 +43,13 @@ public class Announcement {
     @NotNull(message = "Created date cannot be null")
     private LocalDate createdAt;
 
-//    @ManyToOne
-//    @JoinColumn(name = "user_id")
-//    private User user;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
-
+    @OneToMany(mappedBy = "announcement", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Set<Inquiry> inquiries;
 
 
 }

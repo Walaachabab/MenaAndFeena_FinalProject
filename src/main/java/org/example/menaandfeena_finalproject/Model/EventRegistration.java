@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -23,6 +24,10 @@ public class EventRegistration {
     private Integer id;
 
 
+//    @Pattern(regexp = "REGISTERED|CANCELLED|ATTENDED|NO_SHOW",
+//            message = "Status must be REGISTERED, CANCELLED, ATTENDED, or NO_SHOW")
+//    @Column(columnDefinition = "varchar(20) not null")
+//    private String status;
     @Pattern(regexp = "PENDING|CONFIRMED|CANCELLED", message = "Status must be PENDING, CONFIRMED, or CANCELLED")
     @Column(columnDefinition = "varchar(20) not null")
     private String status;
@@ -31,10 +36,22 @@ public class EventRegistration {
     @NotNull(message = "Registration date cannot be null")
     private LocalDate registeredAt;
 
+    @Column(columnDefinition = "varchar(100) unique")
+    private String ticketCode;
 
-//    @ManyToOne
-//    @JoinColumn(name = "user_id")
-//    private User user;
+    @Column(columnDefinition = "boolean default false")
+    private Boolean checkedIn = false;
+
+    private LocalDateTime checkedInAt;
+
+    @ManyToOne
+    @JoinColumn(name = "family_member_id")
+    private FamilyMember familyMember;
+
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @ManyToOne
     @JoinColumn(name = "event_id")
