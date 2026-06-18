@@ -1,12 +1,14 @@
 package org.example.menaandfeena_finalproject.Controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.menaandfeena_finalproject.Api.ApiResponse;
+import org.example.menaandfeena_finalproject.DTO.In.LandmarkSyncRequestDto;
+import org.example.menaandfeena_finalproject.DTO.LandmarkResponseDto;
 import org.example.menaandfeena_finalproject.Model.Landmark;
 import org.example.menaandfeena_finalproject.Service.LandmarkService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -16,26 +18,37 @@ public class LandmarkController {
 
     private final LandmarkService landmarkService;
 
+
+    //Reenad
+    // ================= GET ALL =================
     @GetMapping("/get-all")
     public ResponseEntity<List<Landmark>> getAll() {
-        return ResponseEntity.status(200).body(landmarkService.getAll());
+        return ResponseEntity.ok(landmarkService.getAll());
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<ApiResponse> add(@RequestBody @Valid Landmark landmark) {
-        landmarkService.add(landmark);
-        return ResponseEntity.status(201).body(new ApiResponse("Landmark added successfully"));
+    // ================= SYNC =================
+    @PostMapping("/sync")
+    public ResponseEntity<ApiResponse> sync(@RequestBody LandmarkSyncRequestDto dto) {
+        landmarkService.syncLandmarks(dto.getLat(), dto.getLon(), dto.getRadius());
+        return ResponseEntity.ok(new ApiResponse("تم تحديث المعالم بنجاح"));
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<ApiResponse> update(@PathVariable Integer id, @RequestBody @Valid Landmark landmark) {
-        landmarkService.update(id, landmark);
-        return ResponseEntity.status(200).body(new ApiResponse("Landmark updated successfully"));
+    // ================= NEARBY =================
+    @GetMapping("/nearby")
+    public ResponseEntity<List<LandmarkResponseDto>> nearby(
+            @RequestParam Double lat,
+            @RequestParam Double lon) {
+
+        return ResponseEntity.ok(landmarkService.getNearby(lat, lon));
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<ApiResponse> delete(@PathVariable Integer id) {
-        landmarkService.delete(id);
-        return ResponseEntity.status(200).body(new ApiResponse("Landmark deleted successfully"));
+    // ================= DASHBOARD =================
+    @GetMapping("/neighborhood-dashboard/{userId}")
+    public ResponseEntity<ApiResponse> dashboard(@PathVariable Integer userId) {
+        return ResponseEntity.ok(
+                new ApiResponse(landmarkService.getNeighborhoodDashboard(userId))
+        );
     }
 }
+
+

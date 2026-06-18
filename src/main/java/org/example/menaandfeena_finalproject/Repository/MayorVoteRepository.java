@@ -7,4 +7,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MayorVoteRepository extends JpaRepository<MayorVote, Integer> {
     MayorVote findMayorVoteById(Integer id);
+        int countByMayorCandidateId(Integer candidateId);
+        boolean existsByUserIdAndElectionRoundId(Integer userId, Integer roundId);
+
+    MayorVote findByUserIdAndElectionRoundId(Integer userId, Integer roundId);
 }
+
+

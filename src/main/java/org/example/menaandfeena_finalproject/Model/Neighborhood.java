@@ -21,25 +21,29 @@ public class Neighborhood {
 
     @Column(nullable = false)
     @NotBlank(message = "Neighborhood name cannot be null")
-    @Size(min = 3, max = 50, message = "Length must be between 3 and 50 characters")
     private String name;
 
     @Column(nullable = false)
     @NotBlank(message = "City cannot be null")
     private String city;
 
-    @Min(value = 0, message = "Population cannot be negative")
     private Integer estimatedPopulation;
-
-    @Min(value = 0, message = "Population cannot be negative")
     private Integer registeredPopulation;
-
     private Date createdAt = new Date();
 
+    // 🌟 حقول إحداثيات مركز الحي لتحديد أقرب حي لليوزر
+    @NotNull(message = "Neighborhood latitude cannot be null")
+    private Double latitude;
+
+    @NotNull(message = "Neighborhood longitude cannot be null")
+    private Double longitude;
+
+    // علاقة الحي مع السكان
     @OneToMany(mappedBy = "neighborhood", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<User> residents;
 
+    // 🌟 تم تفعيل وتصحيح العلاقة مع المعالم المتواجدة في الحي
     @OneToMany(mappedBy = "neighborhood", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Landmark> landmarks;

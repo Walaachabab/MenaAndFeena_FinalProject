@@ -19,11 +19,9 @@ public class Landmark {
 
     @Column(nullable = false)
     @NotBlank(message = "Landmark name cannot be null")
-    @Size(min = 2, max = 50, message = "Length must be between 2 and 50 characters")
     private String name;
 
     @Column(nullable = false)
-    @NotBlank(message = "Type cannot be null")
     @Pattern(regexp = "MOSQUE|SCHOOL|PARK|HOSPITAL|OTHER", message = "Type must be MOSQUE, SCHOOL, PARK, HOSPITAL or OTHER only")
     private String type;
 
@@ -33,8 +31,9 @@ public class Landmark {
     @NotNull(message = "Longitude cannot be null")
     private Double longitude;
 
+    // 🌟 تم تفعيل وربط المعلم بالحي التابع له بشكل صريح ومبسط
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "neighborhood_id", nullable = false)
+    @JoinColumn(name = "neighborhood_id")
     @JsonIgnore
     private Neighborhood neighborhood;
 }

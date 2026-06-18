@@ -19,20 +19,26 @@ public class MayorVoteController {
         return ResponseEntity.status(200).body(mayorVoteService.getAllMayorVotes());
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<?> addMayorVote(@RequestBody MayorVoteInDTO mayorVoteInDTO) {
-        mayorVoteService.addMayorVote(mayorVoteInDTO);
-        return ResponseEntity.status(200).body(new ApiResponse("Mayor vote added"));
+//Reenad
+    @PostMapping("/add/{userId}/{candidateId}/{roundId}")
+    public ResponseEntity<ApiResponse> addMayorVote(
+            @PathVariable Integer userId,
+            @PathVariable Integer candidateId,
+            @PathVariable Integer roundId) {
+
+        String resultMessage = mayorVoteService.addMayorVote(userId, candidateId, roundId);
+
+        return ResponseEntity.status(200).body(new ApiResponse(resultMessage));
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateMayorVote(@PathVariable Integer id, @RequestBody MayorVoteInDTO mayorVoteInDTO) {
+    public ResponseEntity<ApiResponse> updateMayorVote(@PathVariable Integer id, @RequestBody MayorVoteInDTO mayorVoteInDTO) {
         mayorVoteService.updateMayorVote(id, mayorVoteInDTO);
         return ResponseEntity.status(200).body(new ApiResponse("Mayor vote updated"));
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteMayorVote(@PathVariable Integer id) {
+    public ResponseEntity<ApiResponse> deleteMayorVote(@PathVariable Integer id) {
         mayorVoteService.deleteMayorVote(id);
         return ResponseEntity.status(200).body(new ApiResponse("Mayor vote deleted"));
     }

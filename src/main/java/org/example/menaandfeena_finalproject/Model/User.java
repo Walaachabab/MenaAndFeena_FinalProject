@@ -4,10 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
-
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Setter
 @Getter
@@ -24,7 +23,6 @@ public class User {
 
     @Column(nullable = false)
     @NotBlank(message = "Full name cannot be blank")
-    @Size(min = 2, max = 50, message = "Full name must be between 2 and 50 characters")
     private String fullName;
 
     @Column(nullable = false, unique = true)
@@ -34,47 +32,42 @@ public class User {
 
     @Column(nullable = false)
     @NotBlank(message = "Password cannot be blank")
-    @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
 
     @Column(nullable = false)
     @NotBlank(message = "Phone number cannot be blank")
     private String phone;
 
-    @Column(unique = true)
     private String nationalId;
-
     private LocalDate birthDate;
-
-    @Column
-    @Pattern(regexp = "MALE|FEMALE", message = "Gender must be either MALE or FEMALE only")
     private String gender;
-
-    @Column
-    @Pattern(regexp = "RESIDENT|MAYOR", message = "Status must be either RESIDENT or MAYOR only")
-    private String status;
-
+    private String status = "RESIDENT";
     private Integer yearsInNeighborhood;
-
     private Boolean isVerified = false;
+    private LocalDate createdAt = LocalDate.now();
 
-    private LocalDate createdAt =  LocalDate.now();
+    // 🌟 حقول الإحداثيات المضافة لتخزين موقع المستخدم عند التسجيل
+    @NotNull(message = "User latitude cannot be null")
+    private Double latitude;
 
-    // علاقة أفراد العائلة (One User to Many Family Members)
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<FamilyMember> familyMembers;
+    @NotNull(message = "User longitude cannot be null")
+    private Double longitude;
 
     // علاقة السكن داخل حي (Many Users to One Neighborhood)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "neighborhood_id")
+    @JsonIgnore // لمنع التكرار اللانهائي في الطباعة
     private Neighborhood neighborhood;
 
-    // علاقة البلاغات المرفوعة (One User to Many Issue Reports)
+    // بقية العلاقات الحالية للمستخدم (مبسطة وبدون تغيير في المسميات)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FamilyMember> familyMembers;
+
     @OneToMany(mappedBy = "reporter", cascade = CascadeType.ALL)
     private List<IssueReport> issueReports;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    @JsonIgnore // لحماية الحساب من طباعة جميع الطلبات تلقائياً
+    @JsonIgnore
     private List<Orders> orders;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
@@ -93,5 +86,15 @@ public class User {
     @JsonIgnore
     private List<MayorVote> votes;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Set<MayorCandidate> mayorCandidacies;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Set<MayorVote> mayorVotes;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private MayorProfile mayorProfile;
 }

@@ -1,5 +1,6 @@
 package org.example.menaandfeena_finalproject.Controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.menaandfeena_finalproject.Api.ApiResponse;
 import org.example.menaandfeena_finalproject.DTO.In.ElectionRoundInDTO;
@@ -20,20 +21,33 @@ public class ElectionRoundController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addElectionRound(@RequestBody ElectionRoundInDTO electionRoundInDTO) {
+    public ResponseEntity<ApiResponse> addElectionRound(@RequestBody @Valid ElectionRoundInDTO electionRoundInDTO) {
         electionRoundService.addElectionRound(electionRoundInDTO);
-        return ResponseEntity.status(200).body(new ApiResponse("Election round added"));
+        return ResponseEntity.status(201).body(new ApiResponse("Election round added successfully"));
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateElectionRound(@PathVariable Integer id, @RequestBody ElectionRoundInDTO electionRoundInDTO) {
+    public ResponseEntity<ApiResponse> updateElectionRound(@PathVariable Integer id, @RequestBody @Valid ElectionRoundInDTO electionRoundInDTO) {
         electionRoundService.updateElectionRound(id, electionRoundInDTO);
-        return ResponseEntity.status(200).body(new ApiResponse("Election round updated"));
+        return ResponseEntity.status(200).body(new ApiResponse("Election round updated successfully"));
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteElectionRound(@PathVariable Integer id) {
+    public ResponseEntity<ApiResponse> deleteElectionRound(@PathVariable Integer id) {
         electionRoundService.deleteElectionRound(id);
-        return ResponseEntity.status(200).body(new ApiResponse("Election round deleted"));
+        return ResponseEntity.status(200).body(new ApiResponse("Election round deleted successfully"));
+    }
+
+    //Reenad
+    @GetMapping("/get-all-rounds")
+    public ResponseEntity<?> getAllRounds() {
+        return ResponseEntity.status(200).body(electionRoundService.getAllRounds());
+    }
+
+    @GetMapping("/details/{id}")
+    public ResponseEntity<ApiResponse> getRoundDetails(@PathVariable Integer id) {
+        String content = electionRoundService.checkAndGetRoundDetailsString(id);
+
+        return ResponseEntity.status(200).body(new ApiResponse(content));
     }
 }

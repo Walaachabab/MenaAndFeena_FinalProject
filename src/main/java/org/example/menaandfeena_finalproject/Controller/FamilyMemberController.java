@@ -16,16 +16,17 @@ public class FamilyMemberController {
 
     private final FamilyMemberService familyMemberService;
 
-    @GetMapping("/get-all")
-    public ResponseEntity<List<FamilyMember>> getAll() {
-        return ResponseEntity.status(200).body(familyMemberService.getAll());
+    @GetMapping("/my-family/{userId}")
+    public ResponseEntity<List<FamilyMember>> getMyFamily(@PathVariable Integer userId) {
+        return ResponseEntity.status(200).body(familyMemberService.getMyFamily(userId));
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<ApiResponse> add(@RequestBody @Valid FamilyMember familyMember) {
-        familyMemberService.add(familyMember);
+    @PostMapping("/add/{userId}")
+    public ResponseEntity<ApiResponse> add(@PathVariable Integer userId, @RequestBody @Valid FamilyMember familyMember) {
+        familyMemberService.add(userId, familyMember);
         return ResponseEntity.status(201).body(new ApiResponse("Family member added successfully"));
     }
+
 
     @PutMapping("/update/{id}")
     public ResponseEntity<ApiResponse> update(@PathVariable Integer id, @RequestBody @Valid FamilyMember familyMember) {
