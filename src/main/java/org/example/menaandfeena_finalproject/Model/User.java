@@ -89,6 +89,9 @@ public class User {
     @JsonIgnore
     private List<Review> reviews;
 
+
+    private LocalDate createdAt;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<MayorVote> votes;

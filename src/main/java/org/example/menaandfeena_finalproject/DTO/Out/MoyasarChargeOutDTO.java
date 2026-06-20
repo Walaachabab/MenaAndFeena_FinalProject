@@ -1,14 +1,25 @@
 package org.example.menaandfeena_finalproject.DTO.Out;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-// Minimal result of a Moyasar card charge: the Moyasar payment id, status, and optional 3DS URL.
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class MoyasarChargeOutDTO {
-    private String id;
+
+//    private String id;
+//    private String status;
+//    private Integer amount;
+//    private String transactionUrl;
+
+    private String moyasarPaymentId;
     private String status;
     private Integer amount;
     private String transactionUrl;
+}
+
 }
