@@ -29,8 +29,6 @@ public interface IssueReportRepository extends JpaRepository<IssueReport, Intege
     List<IssueReport> findByReporterId(Integer reporterId);
 
     List<IssueReport> findIssueReportsByReportNeighborhoodId(Integer neighborhoodId);
-    List<IssueReport> findByReporterId(Integer reporterId);
-    Integer countByReporterIdAndStatus(Integer reporterId, String status);
 
     @Query("""
         select i from IssueReport i
