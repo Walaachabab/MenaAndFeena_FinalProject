@@ -49,4 +49,12 @@ public class Payment {
     @JoinColumn(name = "order_id", referencedColumnName = "id")
     @JsonIgnore
     private Orders orders;
+
+    @OneToOne
+    @JoinColumn(name = "event_registration_id")
+    @JsonIgnore
+    private EventRegistration eventRegistration;
+
+
+
 }

@@ -3,7 +3,9 @@ package org.example.menaandfeena_finalproject.Controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.menaandfeena_finalproject.Api.ApiResponse;
+import org.example.menaandfeena_finalproject.DTO.In.OrderPaymentRequestDTO;
 import org.example.menaandfeena_finalproject.DTO.In.PaymentRequestDTO;
+import org.example.menaandfeena_finalproject.DTO.Out.PaymentInvoiceDTO;
 import org.example.menaandfeena_finalproject.Service.PaymentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,12 +23,28 @@ public class PaymentController {
         return paymentService.processPayment(paymentRequest);
     }
 
+
     @GetMapping("/get-status/{id}")
     public ResponseEntity<?> getPaymentStatus(@PathVariable String id) {
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(paymentService.getPaymentStatus(id));
+                .body(paymentService.getPaymentInvoice(id));
     }
+
+//    @GetMapping("/invoice/{id}")
+//    public ResponseEntity getPaymentInvoice(@PathVariable String id) {
+//
+//        return ResponseEntity.status(200).body(paymentService.getPaymentInvoice(id));
+//    }
+
+
+// original
+//    @GetMapping("/get-status/{id}")
+//    public ResponseEntity<?> getPaymentStatus(@PathVariable String id) {
+//
+//        return ResponseEntity.status(HttpStatus.OK)
+//                .body(paymentService.getPaymentStatus(id));
+//    }
 
     @GetMapping("/get")
     public ResponseEntity<?> getAllPayments() {
@@ -38,4 +56,28 @@ public class PaymentController {
         paymentService.deletePayment(id);
         return ResponseEntity.status(200).body(new ApiResponse("Payment deleted"));
     }
+
+
+
+ // Walaa
+    @PostMapping("/pay-event/{registrationId}")
+    public ResponseEntity payEventRegistration(@PathVariable Integer registrationId,
+                                               @RequestBody @Valid OrderPaymentRequestDTO card) {
+
+        return ResponseEntity.status(200).body(paymentService.payEventRegistration(registrationId, card));
+    }
+
+// Walaa
+
+    @GetMapping("/callback")
+    public ResponseEntity paymentCallback(@RequestParam String id,
+                                          @RequestParam String status,
+                                          @RequestParam(required = false) String message) {
+
+        paymentService.handlePaymentCallback(id, status);
+        return ResponseEntity.status(200).body(new ApiResponse("Payment callback handled successfully"));
+    }
+
+
+
 }

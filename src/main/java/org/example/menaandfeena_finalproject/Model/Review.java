@@ -54,6 +54,4 @@ public class Review {
     private Initiative initiative;
 
 
-
-
 }

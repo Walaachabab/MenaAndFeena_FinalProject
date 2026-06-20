@@ -15,6 +15,6 @@ public class OrderInDTO {
     private Integer userId;
 
     private LocalDate startDate;
-
     private LocalDate endDate;
+
 }

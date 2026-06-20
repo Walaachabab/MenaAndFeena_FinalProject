@@ -52,12 +52,15 @@ public class Initiative {
     @JsonIgnore
     private Set<Review> reviews;
 
-
-
     @NotEmpty(message = "Category cannot be empty")
     @Pattern(regexp = "ENVIRONMENTAL|VOLUNTEERING|EDUCATIONAL|HEALTH|SPORTS", message = "Category must be ENVIRONMENTAL, "
             + "VOLUNTEERING, EDUCATIONAL, HEALTH, or SPORTS")
     @Column(columnDefinition = "varchar(30) not null")
     private String category;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
+    private User user;
 
 }

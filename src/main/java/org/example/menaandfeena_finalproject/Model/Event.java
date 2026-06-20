@@ -68,7 +68,8 @@ public class Event {
     @JsonIgnore
     private Set<Review> reviews;
 
-
-
-
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
+    private User user;
 }
