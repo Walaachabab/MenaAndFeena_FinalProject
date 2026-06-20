@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -49,6 +50,11 @@ public class User {
     private Integer yearsInNeighborhood;
 
     private Boolean isVerified = false;
+
+    // TEMP TEST FIX: Added only because existing UserService and MayorCandidateService call getCreatedAt().
+    // Revisit with the owner of user/mayor work before keeping permanently.
+    @CreationTimestamp
+    private LocalDate createdAt;
 
     // 🌟 حقول الإحداثيات المضافة لتخزين موقع المستخدم عند التسجيل
     @NotNull(message = "User latitude cannot be null")
@@ -99,6 +105,11 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
     private MayorProfile mayorProfile;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Cart cart;
+
     @OneToMany(mappedBy = "requester", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Inquiry> requestedInquiries;
