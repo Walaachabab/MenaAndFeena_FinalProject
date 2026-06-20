@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @NoArgsConstructor
@@ -54,8 +56,6 @@ public class Orders {
     @OneToOne(mappedBy = "orders", cascade = CascadeType.ALL)
     private Payment payment;
 
-    @OneToOne(mappedBy = "orders", cascade = CascadeType.ALL)
-    private Insurance insurance;
 
     @ManyToOne
     @JoinColumn(name = "seller_id")

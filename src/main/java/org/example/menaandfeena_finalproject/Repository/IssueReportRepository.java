@@ -23,7 +23,6 @@ public interface IssueReportRepository extends JpaRepository<IssueReport, Intege
 
     // TEMP TEST FIX: Added only to satisfy MayorCandidateService during marketplace/invoice testing.
     // Revisit with the owner of mayor/issue-report work before keeping permanently.
-    int countByReporterIdAndStatus(Integer reporterId, String status);
 
     // TEMP TEST FIX: Alias added only because existing UserService calls findByReporterId().
     // Revisit with the owner of user/issue-report work before keeping permanently.
@@ -41,8 +40,6 @@ public interface IssueReportRepository extends JpaRepository<IssueReport, Intege
     List<IssueReport> searchIssueReports(@Param("keyword") String keyword);
 
     Integer countByReporterIdAndStatus(Integer id, String status);
-
-    List<IssueReport> findByReporterId(Integer id);
 
     List<IssueReport> findTop3ByReportNeighborhoodOrderByCreatedAtDesc(Neighborhood neighborhood);
 

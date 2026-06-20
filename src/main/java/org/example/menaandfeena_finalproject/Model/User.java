@@ -54,9 +54,8 @@ public class User {
     // TEMP TEST FIX: Added only because existing UserService and MayorCandidateService call getCreatedAt().
     // Revisit with the owner of user/mayor work before keeping permanently.
     @CreationTimestamp
-    private LocalDate createdAt;
+    private LocalDate createdAt=LocalDate.now();
 
-    // 🌟 حقول الإحداثيات المضافة لتخزين موقع المستخدم عند التسجيل
     @NotNull(message = "User latitude cannot be null")
     private Double latitude;
 
@@ -123,7 +122,7 @@ public class User {
     private List<InquiryMessage> inquiryMessages;
 
 
-    private LocalDate createdAt =  LocalDate.now();
+    //private LocalDate createdAt =  LocalDate.now();
 
     private LocalDate mayorStartDate;
     private LocalDate mayorEndDate;

@@ -840,8 +840,8 @@ public class UserService {
                                 o.getId(),
                                 o.getMarketPlaceItem().getTitle(),
                                 o.getUser().getFullName(),
-                                o.getMarketPlaceItem().getSeller().getFullName(),
-                                o.getType(),
+                                o.getSeller().getFullName(),
+                                o.getMarketPlaceItem().getType(),
                                 o.getStatus(),
                                 o.getTotalAmount()
                         )
@@ -851,15 +851,15 @@ public class UserService {
 
     private List<UserOrderDTO> getSales(Integer userId) {
 
-        return orderRepository.findOrdersByMarketPlaceItemUserId(userId)
+        return orderRepository.findOrdersBySellerId(userId)
                 .stream()
                 .map(o ->
                         new UserOrderDTO(
                                 o.getId(),
                                 o.getMarketPlaceItem().getTitle(),
                                 o.getUser().getFullName(),
-                                o.getMarketPlaceItem().getSeller().getFullName(),
-                                o.getType(),
+                                o.getSeller().getFullName(),
+                                o.getMarketPlaceItem().getType(),
                                 o.getStatus(),
                                 o.getTotalAmount()
                         )
