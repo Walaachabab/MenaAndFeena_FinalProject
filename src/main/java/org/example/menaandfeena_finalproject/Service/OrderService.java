@@ -444,6 +444,15 @@ public class OrderService {
         return buildOrderOutDTO(order);
     }
 
+    public OrderOutDTO getOrderById(Integer orderId, Integer userId) {
+        Orders order = orderRepository.findOrderById(orderId);
+        if (order == null) {
+            throw new ApiException("Order not found");
+        }
+        validateBuyerOrderNeighborhood(order, userId);
+        return buildOrderOutDTO(order);
+    }
+
     private void trySendInvoiceEmail(Orders order) {
         try {
             byte[] invoicePdf = generateInvoicePdf(order.getId());

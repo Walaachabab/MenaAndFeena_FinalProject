@@ -44,15 +44,16 @@ public class MayorProfileController {
         return ResponseEntity.status(200).body(new ApiResponse("Mayor profile deleted successfully"));
     }
 
-        @GetMapping("/analytics/{id}")
-        public ResponseEntity<?> getAnalytics(@PathVariable Integer id) {
-            return ResponseEntity.status(200).body(mayorProfileService.getMayorAnalytics(id));
-        }
+    @GetMapping("/analytics/{id}")
+    public ResponseEntity<?> getAnalytics(@PathVariable Integer id) {
+        return ResponseEntity.status(200).body(mayorProfileService.getMayorAnalytics(id));
+    }
 
-        @GetMapping("/reports/{id}")
-        public ResponseEntity<?> getReports(@PathVariable Integer id) {
-            return ResponseEntity.status(200).body(mayorProfileService.getMayorReports(id));
-        }
+    @GetMapping("/reports/{id}")
+    public ResponseEntity<?> getReports(@PathVariable Integer id) {
+        return ResponseEntity.status(200).body(mayorProfileService.getMayorReports(id));
+    }
+
     @GetMapping("/weekly/{id}")
     public void weekly(@PathVariable Integer id) {
         mayorProfileService.sendWeeklyReport(id);
@@ -69,14 +70,9 @@ public class MayorProfileController {
     }
 
     @PostMapping("/resend-appointment-email/{mayorId}")
-    public ResponseEntity<?> resendMayorAppointmentEmail(
-            @PathVariable Integer mayorId
-    ) {
+    public ResponseEntity<?> resendMayorAppointmentEmail(@PathVariable Integer mayorId) {
         mayorProfileService.resendMayorAppointmentEmail(mayorId);
-
-        return ResponseEntity.status(200).body(
-                new ApiResponse("تم إعادة إرسال رسالة تنصيب العمدة")
-        );
+        return ResponseEntity.status(200).body(new ApiResponse("تم إعادة إرسال رسالة تنصيب العمدة"));
     }
-    }
+}
 
