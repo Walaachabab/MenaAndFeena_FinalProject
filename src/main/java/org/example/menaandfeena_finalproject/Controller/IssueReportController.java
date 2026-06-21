@@ -67,6 +67,8 @@ public class IssueReportController {
 
     @GetMapping("/user/{userId}/report/{reportId}")
     public ResponseEntity<?> getUserIssueReportById(@PathVariable Integer userId, @PathVariable Integer reportId) {
+        // TODO: راجع لاحقاً عزل الأحياء هنا؛ المفترض أن المستخدم لا يستطيع فتح بلاغ خارج حيه.
+        // حالياً نترك المنطق كما هو للاختبار، وبعد تطبيق JWT سنربطه بالمستخدم المسجل دخوله.
         return ResponseEntity.status(200).body(issueReportService.getUserIssueReportById(userId, reportId));
     }
 
@@ -97,6 +99,11 @@ public class IssueReportController {
 
     @GetMapping("/mayor-report/{userId}/pdf")
     public ResponseEntity<byte[]> generateMayorIssueReportPdf(@PathVariable Integer userId) {
+        // TODO: راجع لاحقاً تحقق صلاحية العمدة؛ يجب أن يعمل فقط للعمدة الفعال في نفس الحي.
+        // حالياً userId مؤقت قبل Spring Security/JWT، وبعدها سيستبدل بالمستخدم المصادق عليه.
+        // هذا endpoint مخصص لتحميل تقرير PDF للعمدة.
+        // الـ Service هو الذي يتحقق من صلاحية العمدة ويولد محتوى الـ PDF كـ byte[].
+        // هنا في الـ Controller نجهز فقط استجابة HTTP: نوع الملف PDF واسم الملف عند التحميل.
         byte[] pdfBytes = issueReportService.generateMayorIssueReportPdf(userId);
 
         HttpHeaders headers = new HttpHeaders();
@@ -104,6 +111,14 @@ public class IssueReportController {
         headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"Neighborhood-Issue-Report.pdf\"");
 
         return ResponseEntity.ok().headers(headers).body(pdfBytes);
+    }
+
+    @PostMapping("/mayor-report/{userId}/pdf/email")
+    public ResponseEntity<?> sendMayorIssueReportPdfEmail(@PathVariable Integer userId) {
+        // هذا endpoint منفصل عن التحميل: يولد نفس تقرير PDF ويرسله كمرفق على إيميل العمدة.
+        // فصلناه حتى نقدر نختبر التحميل وحده، ونختبر الإرسال بالبريد وحده بدون خلط بين السلوكين.
+        issueReportService.sendMayorIssueReportPdfEmail(userId);
+        return ResponseEntity.status(200).body(new ApiResponse("Issue report PDF sent to mayor email"));
     }
 
     @GetMapping("/neighborhood/{neighborhoodId}")
@@ -116,24 +131,21 @@ public class IssueReportController {
         return ResponseEntity.status(200).body(issueReportService.searchIssueReports(keyword));
     }
 
-    @PutMapping("/{id}/status")
-    public ResponseEntity<?> updateIssueReportStatus(@PathVariable Integer id, @RequestParam String status) {
-        issueReportService.updateIssueReportStatus(id, status);
-        return ResponseEntity.status(200).body(new ApiResponse("Issue report status updated successfully"));
-    }
-
-    @PutMapping("/{id}/start-progress")
-    public ResponseEntity<?> startProgress(@PathVariable Integer id) {
-        issueReportService.startProgress(id);
+    // TODO: بعد إضافة Spring Security/JWT نحذف userId من الرابط ونأخذ العمدة من المستخدم المسجل دخوله.
+    @PutMapping("/{id}/start-progress/{userId}")
+    public ResponseEntity<?> startProgress(@PathVariable Integer id, @PathVariable Integer userId) {
+        issueReportService.startProgress(id, userId);
         return ResponseEntity.status(200).body(new ApiResponse("Issue report moved to in progress successfully"));
     }
 
-    @PutMapping("/{id}/complete")
-    public ResponseEntity<?> completeReport(@PathVariable Integer id) {
-        issueReportService.completeReport(id);
+    // TODO: بعد إضافة Spring Security/JWT نحذف userId من الرابط ونأخذ العمدة من المستخدم المسجل دخوله.
+    @PutMapping("/{id}/complete/{userId}")
+    public ResponseEntity<?> completeReport(@PathVariable Integer id, @PathVariable Integer userId) {
+        issueReportService.completeReport(id, userId);
         return ResponseEntity.status(200).body(new ApiResponse("Issue report completed successfully"));
     }
 
+    // TODO: بعد إضافة Spring Security/JWT هذا endpoint يجب أن يكون للـ ADMIN فقط لأنه يعدل بيانات البلاغ كاملة.
     @PutMapping("/update/{id}")
     public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody @Valid IssueReport issueReport) {
         issueReportService.update(id, issueReport);

@@ -25,4 +25,6 @@ public interface MayorProfileRepository extends JpaRepository<MayorProfile, Inte
             Integer userId,
             String status
     );
+
+    MayorProfile findMayorProfileByUserId(Integer userId);
 }
