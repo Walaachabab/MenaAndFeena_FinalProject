@@ -1,9 +1,7 @@
 package org.example.menaandfeena_finalproject.Controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.menaandfeena_finalproject.Api.ApiResponse;
-import org.example.menaandfeena_finalproject.DTO.In.MayorCandidateInDTO;
 import org.example.menaandfeena_finalproject.DTO.Out.CandidateDetailsDTO;
 import org.example.menaandfeena_finalproject.DTO.Out.ElectionPageDTO;
 import org.example.menaandfeena_finalproject.Service.MayorCandidateService;
@@ -26,7 +24,7 @@ public class MayorCandidateController {
     @GetMapping
     public ResponseEntity<?> getAllMayorCandidates() {
 
-        return ResponseEntity.ok(
+        return ResponseEntity.status(200).body(
                 mayorCandidateService.getAllMayorCandidates()
         );
     }
@@ -37,14 +35,14 @@ public class MayorCandidateController {
     // =========================
 
     @PostMapping("/apply/{userId}/round/{roundId}")
-    public ResponseEntity<ApiResponse> applyForMayorCandidacy(
+    public ResponseEntity<?> applyForMayorCandidacy(
             @PathVariable Integer userId,
             @PathVariable Integer roundId
     ) {
 
         mayorCandidateService.applyForMayorCandidacy(userId, roundId);
 
-        return ResponseEntity.status(201).body(
+        return ResponseEntity.status(200).body(
                 new ApiResponse("تم ترشيح المستخدم لمنصب عمدة الحي بنجاح")
         );
     }
@@ -59,7 +57,7 @@ public class MayorCandidateController {
             @PathVariable Integer roundId
     ) {
 
-        return ResponseEntity.ok(
+        return ResponseEntity.status(200).body(
                 mayorCandidateService.getCandidatesByRound(roundId)
         );
     }
@@ -70,11 +68,11 @@ public class MayorCandidateController {
     // =========================
 
     @GetMapping("/round/{roundId}/dashboard")
-    public ResponseEntity<ElectionPageDTO> getElectionDashboard(
+    public ResponseEntity<?> getElectionDashboard(
             @PathVariable Integer roundId
     ) {
 
-        return ResponseEntity.ok(
+        return ResponseEntity.status(200).body(
                 mayorCandidateService.getElectionDashboard(roundId)
         );
     }
@@ -85,11 +83,11 @@ public class MayorCandidateController {
     // =========================
 
     @GetMapping("/{candidateId}/profile")
-    public ResponseEntity<CandidateDetailsDTO> getCandidateProfile(
+    public ResponseEntity<?> getCandidateProfile(
             @PathVariable Integer candidateId
     ) {
 
-        return ResponseEntity.ok(
+        return ResponseEntity.status(200).body(
                 mayorCandidateService.getCandidateProfile(candidateId)
         );
     }
@@ -100,17 +98,13 @@ public class MayorCandidateController {
     // =========================
 
     @PutMapping("/{candidateId}")
-    public ResponseEntity<ApiResponse> updateMayorCandidate(
-            @PathVariable Integer candidateId,
-            @RequestBody @Valid MayorCandidateInDTO mayorCandidateInDTO
+    public ResponseEntity<?> updateMayorCandidate(
+            @PathVariable Integer candidateId
     ) {
 
-        mayorCandidateService.updateMayorCandidate(
-                candidateId,
-                mayorCandidateInDTO
-        );
+        mayorCandidateService.updateMayorCandidate(candidateId);
 
-        return ResponseEntity.ok(
+        return ResponseEntity.status(200).body(
                 new ApiResponse("تم تحديث بيانات المرشح بنجاح")
         );
     }
@@ -121,13 +115,13 @@ public class MayorCandidateController {
     // =========================
 
     @DeleteMapping("/{candidateId}")
-    public ResponseEntity<ApiResponse> deleteMayorCandidate(
+    public ResponseEntity<?> deleteMayorCandidate(
             @PathVariable Integer candidateId
     ) {
 
         mayorCandidateService.deleteMayorCandidate(candidateId);
 
-        return ResponseEntity.ok(
+        return ResponseEntity.status(200).body(
                 new ApiResponse("تم حذف المرشح بنجاح")
         );
     }

@@ -60,7 +60,10 @@ public class MarketPlaceItemService {
         for (MarketPlaceItem item : marketPlaceItemRepository.findAll()) {
             if (item.getUser() != null
                     && item.getUser().getNeighborhood() != null
-                    && item.getUser().getNeighborhood().getId().equals(user.getNeighborhood().getId())) {
+                    && item.getUser().getNeighborhood().getId().equals(user.getNeighborhood().getId())
+                    && "AVAILABLE".equals(item.getStatus())
+                    && item.getQuantity() != null
+                    && item.getQuantity() > 0) {
                 Integer itemUserId = item.getUser().getId();
                 String sellerFullName = item.getUser().getFullName();
                 marketPlaceItemOutDTOS.add(new MarketPlaceItemOutDTO(item.getId(), item.getTitle(), item.getDescription(), item.getType(), item.getStatus(), item.getPrice(), item.getRentPrice(), item.getDepositAmount(), item.getQuantity(), itemUserId, sellerFullName));
@@ -107,6 +110,9 @@ public class MarketPlaceItemService {
 
         if (user == null) {
             throw new ApiException("User not found");
+        }
+        if (user.getNeighborhood() == null) {
+            throw new ApiException("User neighborhood is required");
         }
 
         MarketPlaceItem marketPlaceItem = new MarketPlaceItem();
@@ -165,6 +171,12 @@ public class MarketPlaceItemService {
         if (user == null) {
             throw new ApiException("User not found");
         }
+        if (user.getNeighborhood() == null) {
+            throw new ApiException("User neighborhood is required");
+        }
+        if (oldMarketPlaceItem.getUser() == null || !oldMarketPlaceItem.getUser().getId().equals(userId)) {
+            throw new ApiException("Only the item owner can update item");
+        }
 
         oldMarketPlaceItem.setTitle(marketPlaceItemInDTO.getTitle());
         oldMarketPlaceItem.setDescription(marketPlaceItemInDTO.getDescription());
@@ -173,16 +185,27 @@ public class MarketPlaceItemService {
         oldMarketPlaceItem.setRentPrice(marketPlaceItemInDTO.getRentPrice());
         oldMarketPlaceItem.setDepositAmount(marketPlaceItemInDTO.getDepositAmount());
         oldMarketPlaceItem.setQuantity(marketPlaceItemInDTO.getQuantity());
-        oldMarketPlaceItem.setUser(user);
 
         marketPlaceItemRepository.save(oldMarketPlaceItem);
     }
 
-    public void deleteMarketPlaceItem(Integer id) {
+    public void deleteMarketPlaceItem(Integer id, Integer userId) {
         MarketPlaceItem marketPlaceItem = marketPlaceItemRepository.findMarketPlaceItemById(id);
 
         if (marketPlaceItem == null) {
             throw new ApiException("Market place item not found");
+        }
+
+        User user = userRepository.findUserById(userId);
+
+        if (user == null) {
+            throw new ApiException("User not found");
+        }
+        if (user.getNeighborhood() == null) {
+            throw new ApiException("User neighborhood is required");
+        }
+        if (marketPlaceItem.getUser() == null || !marketPlaceItem.getUser().getId().equals(userId)) {
+            throw new ApiException("Only the item owner can delete item");
         }
 
         marketPlaceItemRepository.delete(marketPlaceItem);
@@ -220,6 +243,12 @@ public class MarketPlaceItemService {
         }
         if (!marketPlaceItem.getUser().getNeighborhood().getId().equals(user.getNeighborhood().getId())) {
             throw new ApiException("Market place item is outside your neighborhood");
+        }
+        if (!"AVAILABLE".equals(marketPlaceItem.getStatus())) {
+            throw new ApiException("Market place item is unavailable");
+        }
+        if (marketPlaceItem.getQuantity() == null || marketPlaceItem.getQuantity() <= 0) {
+            throw new ApiException("Market place item is out of stock");
         }
 
         Integer itemUserId = marketPlaceItem.getUser().getId();
@@ -260,7 +289,10 @@ public class MarketPlaceItemService {
         for (MarketPlaceItem item : marketPlaceItemRepository.findMarketPlaceItemsByType(type)) {
             if (item.getUser() != null
                     && item.getUser().getNeighborhood() != null
-                    && item.getUser().getNeighborhood().getId().equals(user.getNeighborhood().getId())) {
+                    && item.getUser().getNeighborhood().getId().equals(user.getNeighborhood().getId())
+                    && "AVAILABLE".equals(item.getStatus())
+                    && item.getQuantity() != null
+                    && item.getQuantity() > 0) {
                 Integer itemUserId = item.getUser().getId();
                 String sellerFullName = item.getUser().getFullName();
                 marketPlaceItemOutDTOS.add(new MarketPlaceItemOutDTO(item.getId(), item.getTitle(), item.getDescription(), item.getType(), item.getStatus(), item.getPrice(), item.getRentPrice(), item.getDepositAmount(), item.getQuantity(), itemUserId, sellerFullName));
@@ -286,7 +318,10 @@ public class MarketPlaceItemService {
             if (itemText.contains(searchKeyword)
                     && item.getUser() != null
                     && item.getUser().getNeighborhood() != null
-                    && item.getUser().getNeighborhood().getId().equals(user.getNeighborhood().getId())) {
+                    && item.getUser().getNeighborhood().getId().equals(user.getNeighborhood().getId())
+                    && "AVAILABLE".equals(item.getStatus())
+                    && item.getQuantity() != null
+                    && item.getQuantity() > 0) {
                 Integer itemUserId = item.getUser().getId();
                 String sellerFullName = item.getUser().getFullName();
                 marketPlaceItemOutDTOS.add(new MarketPlaceItemOutDTO(item.getId(), item.getTitle(), item.getDescription(), item.getType(), item.getStatus(), item.getPrice(), item.getRentPrice(), item.getDepositAmount(), item.getQuantity(), itemUserId, sellerFullName));
