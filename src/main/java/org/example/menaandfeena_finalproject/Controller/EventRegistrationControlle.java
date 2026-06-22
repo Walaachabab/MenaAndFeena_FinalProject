@@ -7,6 +7,8 @@ import org.example.menaandfeena_finalproject.DTO.In.EventRegistrationInDTO;
 import org.example.menaandfeena_finalproject.Service.EventRegistrationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import org.example.menaandfeena_finalproject.Model.User;
 
 @RestController
 @RequestMapping("/api/v1/event-registration")
@@ -39,22 +41,44 @@ public class EventRegistrationControlle {
         return ResponseEntity.status(200).body(new ApiResponse("Event registration deleted successfully"));
     }
 
-    @PostMapping("/register/{userId}/{eventId}")
-    public ResponseEntity<?> registerToEvent(@PathVariable Integer userId, @PathVariable Integer eventId) {
-        eventRegistrationService.registerToEvent(userId, eventId);
+//    @PostMapping("/register/{userId}/{eventId}")
+//    public ResponseEntity<?> registerToEvent(@PathVariable Integer userId, @PathVariable Integer eventId) {
+//        eventRegistrationService.registerToEvent(userId, eventId);
+//        return ResponseEntity.status(200).body(new ApiResponse("Registered successfully"));
+//    }
+
+
+    @PostMapping("/register/{eventId}")
+    public ResponseEntity<?> registerToEvent(Authentication authentication,
+                                             @PathVariable Integer eventId) {
+
+        User user = (User) authentication.getPrincipal();
+
+        eventRegistrationService.registerToEvent(user.getId(), eventId);
+
         return ResponseEntity.status(200).body(new ApiResponse("Registered successfully"));
     }
 
 
+//    @PostMapping("/register-family/{familyMemberId}/{eventId}")
+//    public ResponseEntity<?> registerFamilyMember(@PathVariable Integer familyMemberId, @PathVariable Integer eventId) {
+//        eventRegistrationService.registerFamilyMember(familyMemberId, eventId);
+//        return ResponseEntity.status(200).body(new ApiResponse("Family member registered successfully"));
+//    }
+
+
+
     @PostMapping("/register-family/{familyMemberId}/{eventId}")
-    public ResponseEntity<?> registerFamilyMember(@PathVariable Integer familyMemberId, @PathVariable Integer eventId) {
-        eventRegistrationService.registerFamilyMember(familyMemberId, eventId);
+    public ResponseEntity<?> registerFamilyMember(Authentication authentication,
+                                                  @PathVariable Integer familyMemberId,
+                                                  @PathVariable Integer eventId) {
+
+        User user = (User) authentication.getPrincipal();
+
+        eventRegistrationService.registerFamilyMember(user.getId(), familyMemberId, eventId);
+
         return ResponseEntity.status(200).body(new ApiResponse("Family member registered successfully"));
     }
-
-
-
-
 
 
 
