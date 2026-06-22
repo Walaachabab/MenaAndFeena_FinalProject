@@ -164,7 +164,7 @@ public class UserController {
         );
     }
 
-    @GetMapping("/profile/community")
+    /*@GetMapping("/profile/community")
     public ResponseEntity<?> getCommunityProfile(
             @AuthenticationPrincipal User user
     ) {
@@ -192,15 +192,62 @@ public class UserController {
         return ResponseEntity.status(200).body(
                 userService.getReputationProfile(user.getId())
         );
-    }
+    }*/
 
-    @GetMapping("/profile/marketplace")
-    public ResponseEntity<?> getMarketplaceProfile(
+    @GetMapping("/marketplace/summary")
+    public ResponseEntity<?> getMarketplaceSummary(
             @AuthenticationPrincipal User user
     ) {
-
-        return ResponseEntity.status(200).body(
-                userService.getMarketplaceProfile(user.getId())
+        return ResponseEntity.ok(
+                userService.getMarketplaceSummary(user.getId())
         );
+    }
+
+    @GetMapping("/marketplace/my-orders")
+    public ResponseEntity<?> getMyOrders(
+            @AuthenticationPrincipal User user
+    ) {
+        return ResponseEntity.ok(
+                userService.getMyOrdersPage(user.getId())
+        );
+    }
+
+    @GetMapping("/marketplace/product-orders")
+    public ResponseEntity<?> getMyProductOrders(
+            @AuthenticationPrincipal User user
+    ) {
+        return ResponseEntity.ok(
+                userService.getMyProductOrdersPage(user.getId())
+        );
+    }
+
+    @GetMapping("/profile/family")
+    public ResponseEntity<?> getFamilyProfile(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(userService.getFamilyProfile(user.getId()));
+    }
+
+    @GetMapping("/profile/votes")
+    public ResponseEntity<?> getVotesProfile(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(userService.getVotesProfile(user.getId()));
+    }
+
+    @GetMapping("/profile/events")
+    public ResponseEntity<?> getEventsProfile(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(userService.getEventsProfile(user.getId()));
+    }
+
+    @GetMapping("/profile/initiatives")
+    public ResponseEntity<?> getInitiativesProfile(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(userService.getInitiativesProfile(user.getId()));
+    }
+
+    @GetMapping("/profile/reviews")
+    public ResponseEntity<?> getReviewsProfile(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(userService.getReviewsProfile(user.getId()));
+    }
+
+    @GetMapping("/profile/issues")
+    public ResponseEntity<?> getIssuesProfile(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(userService.getIssuesProfile(user.getId()));
     }
 }

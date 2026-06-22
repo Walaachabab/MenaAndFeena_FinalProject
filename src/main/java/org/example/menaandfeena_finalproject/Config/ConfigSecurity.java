@@ -70,9 +70,9 @@ public class ConfigSecurity {
                         ).permitAll()
 
                         .requestMatchers(
-                                HttpMethod.GET,
                                 "/api/v1/payment/callback"
                         ).permitAll()
+
 
                         // =========================
                         // ADMIN ONLY
@@ -83,64 +83,81 @@ public class ConfigSecurity {
                                 "/api/v1/users/add",
                                 "/api/v1/users/update/**",
                                 "/api/v1/users/delete/**",
-                                "/api/v1/landmarks/get-all",
-                                "/api/v1/landmarks/add",
-                                "/api/v1/landmarks/update/**",
-                                "/api/v1/landmarks/delete/**",
-                                "/api/v1/election-rounds/add",
-                                "/api/v1/election-rounds/update/**",
-                                "/api/v1/election-rounds/delete/**",
-                                "/api/v1/mayor-candidates/update/**",
-                                "/api/v1/mayor-candidates/delete/**",
-                                "/api/v1/mayor-profiles/get-all",
-                                "/api/v1/mayor-profiles/add",
-                                "/api/v1/mayor-profiles/update/**",
-                                "/api/v1/mayor-profiles/delete/**",
-                                "/api/v1/mayor-votes/get-all",
-                                "/api/v1/mayor-votes/delete/**",
+
                                 "/api/v1/neighborhoods/get-all",
                                 "/api/v1/neighborhoods/add",
                                 "/api/v1/neighborhoods/update/**",
                                 "/api/v1/neighborhoods/delete/**",
+
+                                "/api/v1/landmarks/get-all",
+                                "/api/v1/landmarks/add",
+                                "/api/v1/landmarks/update/**",
+                                "/api/v1/landmarks/delete/**",
+
+                                "/api/v1/election-rounds/add",
+                                "/api/v1/election-rounds/update/**",
                                 "/api/v1/election-rounds/delete/**",
+
+                                "/api/v1/mayor-candidates/update/**",
+                                "/api/v1/mayor-candidates/delete/**",
+
+                                "/api/v1/mayor-votes/get-all",
+                                "/api/v1/mayor-votes/delete/**",
+
+                                "/api/v1/mayor-profiles/get-all",
+                                "/api/v1/mayor-profiles/add",
+                                "/api/v1/mayor-profiles/update/**",
+                                "/api/v1/mayor-profiles/delete/**",
+
                                 "/api/v1/issue-reports/get-all",
                                 "/api/v1/issue-reports/admin/**",
                                 "/api/v1/issue-reports/status/**",
                                 "/api/v1/issue-reports/priority/**",
                                 "/api/v1/issue-reports/category/**",
-                                "/api/v1/issue-reports/admin/neighborhood/**",
                                 "/api/v1/issue-reports/search",
                                 "/api/v1/issue-reports/delete/**",
+
                                 "/api/v1/orders/get",
                                 "/api/v1/orders/delete/**",
+
                                 "/api/v1/carts/get",
                                 "/api/v1/carts/delete/**",
+
                                 "/api/v1/cart-items/get",
                                 "/api/v1/cart-items/delete/**",
-                                "/api/v1/order-items/add",
+
                                 "/api/v1/order-items/get",
                                 "/api/v1/order-items/update/**",
                                 "/api/v1/order-items/delete/**",
-                                "/api/v1/marketplace/get",
+
                                 "/api/v1/marketplace/admin/**",
-                                "/api/v1/marketplace/type/**",
+                                "/api/v1/marketplace-images/get",
                                 "/api/v1/marketplace-images/add",
                                 "/api/v1/marketplace-images/upload/**",
-                                "/api/v1/marketplace-images/get",
+
                                 "/api/v1/insurance/**"
                         ).hasAuthority("ADMIN")
+
 
                         // =========================
                         // MAYOR ONLY
                         // =========================
 
                         .requestMatchers(
-                                "/api/v1/mayor-profiles/**",
+                                "/api/v1/mayor-profiles/analytics",
+                                "/api/v1/mayor-profiles/reports",
+                                "/api/v1/mayor-profiles/weekly",
+                                "/api/v1/mayor-profiles/performance",
+                                "/api/v1/mayor-profiles/satisfaction",
+                                "/api/v1/mayor-profiles/resend-appointment-email",
+
                                 "/api/v1/mayor-reports/**",
+
                                 "/api/v1/issue-reports/mayor-report/**",
-                                "/api/v1/issue-reports/{id}/start-progress",
-                                "/api/v1/issue-reports/{id}/complete"
+                                "/api/v1/issue-reports/*/start-progress",
+                                "/api/v1/issue-reports/*/complete"
                         ).hasAuthority("MAYOR")
+
 
                         // =========================
                         // USER + MAYOR
@@ -148,55 +165,49 @@ public class ConfigSecurity {
 
                         .requestMatchers(
                                 "/api/v1/users/**",
-                                "/api/v1/neighborhoods/**",
-                                "/api/v1/landmarks/**",
-                                "/api/v1/mayor-candidates/**",
-                                "/api/v1/mayor-votes/**",
-                                "/api/v1/election-rounds/get-all",
-                                "/api/v1/election-rounds/get/**",
+
                                 "/api/v1/family-members/**",
+
+                                "/api/v1/neighborhoods/dashboard",
+
                                 "/api/v1/landmarks/sync",
                                 "/api/v1/landmarks/nearby",
                                 "/api/v1/landmarks/dashboard",
-                                "/api/v1/issue-reports/**",
-                                "/api/v1/tickets/**",
-                                "/api/v1/orders/**",
-                                "/api/v1/carts/**",
-                                "/api/v1/order-items/**",
-                                "/api/v1/marketplace/**",
-                                "/api/v1/marketplace-images/**",
-                                "/api/v1/inquiry/**",
-                                "/api/v1/landmarks/dashboard",
-                                "/api/v1/mayor-votes/vote/**",
+
+                                "/api/v1/election-rounds/get-all",
+                                "/api/v1/election-rounds/get/**",
+
                                 "/api/v1/mayor-candidates/get-all",
                                 "/api/v1/mayor-candidates/round/**",
                                 "/api/v1/mayor-candidates/profile/**",
                                 "/api/v1/mayor-candidates/apply/round/**",
-                                "/api/v1/neighborhoods/dashboard",
+
+                                "/api/v1/mayor-votes/vote/**",
+
+                                "/api/v1/issue-reports/**",
+                                "/api/v1/tickets/**",
+
+                                "/api/v1/orders/**",
+                                "/api/v1/carts/**",
+                                "/api/v1/cart-items/**",
+                                "/api/v1/order-items/**",
+
+                                "/api/v1/marketplace/**",
+                                "/api/v1/marketplace-images/**",
+
+                                "/api/v1/inquiry/**",
                                 "/api/v1/review/**",
                                 "/api/v1/announcement/**",
+
                                 "/api/v1/event/**",
                                 "/api/v1/event-registration/**",
+
                                 "/api/v1/initiative/**",
                                 "/api/v1/initiative-participation/**",
+
                                 "/api/v1/payment/pay-event/**",
                                 "/api/v1/payment/invoice-pdf/**"
                         ).hasAnyAuthority("USER", "MAYOR")
-
-                        // =========================
-                        // MAYOR ONLY
-                        // =========================
-
-                        .requestMatchers(
-                                "/api/v1/mayor-profiles/**",
-                                "/api/v1/mayor-reports/**",
-                                "/api/v1/mayor-profiles/analytics",
-                                "/api/v1/mayor-profiles/reports",
-                                "/api/v1/mayor-profiles/weekly",
-                                "/api/v1/mayor-profiles/performance",
-                                "/api/v1/mayor-profiles/satisfaction",
-                                "/api/v1/mayor-profiles/resend-appointment-email"
-                        ).hasAuthority("MAYOR")
 
                         .anyRequest().authenticated()
                 )

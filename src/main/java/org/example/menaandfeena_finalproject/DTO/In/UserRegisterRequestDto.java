@@ -35,4 +35,5 @@ public class UserRegisterRequestDto {
     private Double latitude;
     private Double longitude;
 
+
 }

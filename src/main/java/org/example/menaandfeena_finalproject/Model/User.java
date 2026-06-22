@@ -51,8 +51,6 @@ public class User implements UserDetails {
 
     private Integer yearsInNeighborhood;
 
-    private Boolean isVerified = false;
-
     @CreationTimestamp
     private LocalDate createdAt=LocalDate.now();
 

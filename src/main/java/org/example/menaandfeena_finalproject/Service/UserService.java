@@ -24,6 +24,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class UserService {
 
+    private final WhatsAppService whatsAppService;
     private final UserRepository userRepository;
     private final NeighborhoodRepository neighborhoodRepository;
     private final InitiativeParticipationRepository initiativeParticipationRepository;
@@ -75,7 +76,6 @@ public class UserService {
         user.setLatitude(dto.getLatitude());
         user.setLongitude(dto.getLongitude());
         user.setStatus("RESIDENT");
-        user.setIsVerified(false);
         userRepository.save(user);
     }
 
@@ -204,13 +204,35 @@ public class UserService {
         user.setBirthDate(dto.getBirthDate());
         user.setGender(dto.getGender());
         user.setStatus("RESIDENT");
-        user.setIsVerified(true);
         user.setNeighborhood(neighborhood);
         user.setYearsInNeighborhood(dto.getYearsInNeighborhood());
         user.setLatitude(dto.getLatitude());
         user.setLongitude(dto.getLongitude());
 
         User savedUser = userRepository.save(user);
+
+        String whatsappMessage =
+                "هلا والله "
+                        + savedUser.getFullName()
+                        + " 👋\n\n"
+                        + "نورت حي "
+                        + neighborhood.getName()
+                        + " 🌟\n\n"
+                        + "تم إنشاء حسابك بنجاح في منصة منا وفينا.";
+
+        try {
+
+            whatsAppService.sendWhatsAppMessage(
+                    savedUser.getPhone(),
+                    whatsappMessage
+            );
+
+        } catch (Exception e) {
+
+            System.out.println(
+                    "WhatsApp sending failed: " + e.getMessage()
+            );
+        }
 
         openElectionRoundIfNeighborhoodReady(neighborhood);
 
@@ -221,8 +243,7 @@ public class UserService {
                 neighborhood.getName(),
                 neighborhood.getCity(),
                 savedUser.getCreatedAt()
-        );
-    }
+        );}
 
     // =========================
     // NEIGHBORHOOD RESIDENTS
@@ -344,7 +365,7 @@ public class UserService {
     // PROFILE COMMUNITY
     // =========================
 
-    public UserProfileCommunityDTO getCommunityProfile(Integer userId) {
+    /*public UserProfileCommunityDTO getCommunityProfile(Integer userId) {
 
         User user = getUserOrThrow(userId);
 
@@ -370,13 +391,13 @@ public class UserService {
         dto.setVotes(mapVotes(user));
 
         return dto;
-    }
+    }*/
 
     // =========================
     // PROFILE ACTIVITIES
     // =========================
 
-    public UserProfileActivitiesDTO getActivitiesProfile(Integer userId) {
+    /*public UserProfileActivitiesDTO getActivitiesProfile(Integer userId) {
 
         User user = getUserOrThrow(userId);
 
@@ -419,13 +440,13 @@ public class UserService {
         );
 
         return dto;
-    }
+    }*/
 
     // =========================
     // PROFILE REPUTATION
     // =========================
 
-    public UserProfileReputationDTO getReputationProfile(Integer userId) {
+   /* public UserProfileReputationDTO getReputationProfile(Integer userId) {
 
         User user = getUserOrThrow(userId);
 
@@ -453,21 +474,16 @@ public class UserService {
         dto.setIssueReports(getUserIssues(user));
 
         return dto;
-    }
+    }*/
 
     // =========================
     // PROFILE MARKETPLACE
     // =========================
+    public UserMarketplaceSummaryDTO getMarketplaceSummary(Integer userId) {
 
-    public UserProfileMarketplaceDTO getMarketplaceProfile(Integer userId) {
+        getUserOrThrow(userId);
 
-        User user = getUserOrThrow(userId);
-
-        UserProfileMarketplaceDTO dto = new UserProfileMarketplaceDTO();
-
-        dto.setBasicInfo(getBasicProfile(userId));
-
-        dto.setMarketplaceItems(
+        List<UserMarketItemDTO> myProducts =
                 marketPlaceItemRepository.findMarketPlaceItemsByUserId(userId)
                         .stream()
                         .map(item ->
@@ -481,15 +497,81 @@ public class UserService {
                                         item.getRentPrice()
                                 )
                         )
-                        .toList()
+                        .toList();
+
+        List<UserOrderDTO> myOrders = getPurchases(userId);
+        List<UserOrderDTO> productOrders = getSales(userId);
+
+        Integer totalPurchasesAmount =
+                myOrders.stream()
+                        .mapToInt(o -> o.getTotalAmount() == null ? 0 : o.getTotalAmount())
+                        .sum();
+
+        Integer totalSalesAmount =
+                productOrders.stream()
+                        .mapToInt(o -> o.getTotalAmount() == null ? 0 : o.getTotalAmount())
+                        .sum();
+
+        return new UserMarketplaceSummaryDTO(
+                getBasicProfile(userId),
+                myOrders.size(),
+                productOrders.size(),
+                myProducts.size(),
+                totalPurchasesAmount,
+                totalSalesAmount,
+                myProducts
         );
-
-        dto.setPurchases(getPurchases(userId));
-
-        dto.setSales(getSales(userId));
-
-        return dto;
     }
+
+    public UserOrdersPageDTO getMyOrdersPage(Integer userId) {
+
+        getUserOrThrow(userId);
+
+        List<UserOrderDTO> orders = getPurchases(userId);
+
+        Integer totalAmount =
+                orders.stream()
+                        .mapToInt(o -> o.getTotalAmount() == null ? 0 : o.getTotalAmount())
+                        .sum();
+
+        return new UserOrdersPageDTO(
+                getBasicProfile(userId),
+                orders.size(),
+                totalAmount,
+                orders
+        );
+    }
+
+    public UserOrdersPageDTO getMyProductOrdersPage(Integer userId) {
+
+        getUserOrThrow(userId);
+
+        List<UserOrderDTO> orders = getSales(userId);
+
+        Integer totalAmount =
+                orders.stream()
+                        .mapToInt(o -> o.getTotalAmount() == null ? 0 : o.getTotalAmount())
+                        .sum();
+
+        return new UserOrdersPageDTO(
+                getBasicProfile(userId),
+                orders.size(),
+                totalAmount,
+                orders
+        );
+    }
+    /*public List<UserOrderDTO> getMyOrders(Integer userId) {
+
+        getUserOrThrow(userId);
+
+        return getPurchases(userId);
+    }
+    public List<UserOrderDTO> getMyProductOrders(Integer userId) {
+
+        getUserOrThrow(userId);
+
+        return getSales(userId);
+    }*/
 
     // =========================
     // PROFILE FULL
@@ -851,55 +933,193 @@ public class UserService {
         List<UserOrderDTO> purchases = new ArrayList<>();
 
         for (Orders order : orderRepository.findOrdersByUserId(userId)) {
-            String buyerName = order.getUser() == null ? null : order.getUser().getFullName();
 
-            for (OrderItem orderItem : orderItemRepository.findOrderItemsByOrdersId(order.getId())) {
+            String buyerName =
+                    order.getUser() == null ? null : order.getUser().getFullName();
+
+            for (OrderItem orderItem :
+                    orderItemRepository.findOrderItemsByOrdersId(order.getId())) {
+
                 MarketPlaceItem item = orderItem.getMarketPlaceItem();
+
                 if (item == null) {
                     continue;
                 }
 
-                String sellerName = item.getUser() == null ? null : item.getUser().getFullName();
-                purchases.add(new UserOrderDTO(
-                        order.getId(),
-                        item.getTitle(),
-                        buyerName,
-                        sellerName,
-                        orderItem.getType(),
-                        order.getStatus(),
-                        orderItem.getSubtotal()
-                ));
+                String sellerName =
+                        item.getUser() == null ? null : item.getUser().getFullName();
+
+                purchases.add(
+                        new UserOrderDTO(
+                                order.getId(),
+                                orderItem.getId(),
+                                item.getTitle(),
+                                buyerName,
+                                sellerName,
+                                orderItem.getType(),
+                                order.getStatus(),
+                                item.getStatus(),
+                                orderItem.getQuantity(),
+                                orderItem.getUnitPrice(),
+                                orderItem.getRentalDays(),
+                                orderItem.getDepositAmount(),
+                                orderItem.getSubtotal(),
+                                orderItem.getStartDate(),
+                                orderItem.getEndDate(),
+                                orderItem.getReturnStatus()
+                        )
+                );
             }
         }
 
         return purchases;
     }
-
     private List<UserOrderDTO> getSales(Integer userId) {
 
         List<UserOrderDTO> sales = new ArrayList<>();
 
-        for (Orders order : orderRepository.findDistinctByOrderItemsMarketPlaceItemUserId(userId)) {
-            String buyerName = order.getUser() == null ? null : order.getUser().getFullName();
+        for (Orders order :
+                orderRepository.findDistinctByOrderItemsMarketPlaceItemUserId(userId)) {
 
-            for (OrderItem orderItem : orderItemRepository.findOrderItemsByOrdersId(order.getId())) {
+            String buyerName =
+                    order.getUser() == null ? null : order.getUser().getFullName();
+
+            for (OrderItem orderItem :
+                    orderItemRepository.findOrderItemsByOrdersId(order.getId())) {
+
                 MarketPlaceItem item = orderItem.getMarketPlaceItem();
-                if (item == null || item.getUser() == null || !item.getUser().getId().equals(userId)) {
+
+                if (item == null ||
+                        item.getUser() == null ||
+                        !item.getUser().getId().equals(userId)) {
                     continue;
                 }
 
-                sales.add(new UserOrderDTO(
-                        order.getId(),
-                        item.getTitle(),
-                        buyerName,
-                        item.getUser().getFullName(),
-                        orderItem.getType(),
-                        order.getStatus(),
-                        orderItem.getSubtotal()
-                ));
+                sales.add(
+                        new UserOrderDTO(
+                                order.getId(),
+                                orderItem.getId(),
+                                item.getTitle(),
+                                buyerName,
+                                item.getUser().getFullName(),
+                                orderItem.getType(),
+                                order.getStatus(),
+                                item.getStatus(),
+                                orderItem.getQuantity(),
+                                orderItem.getUnitPrice(),
+                                orderItem.getRentalDays(),
+                                orderItem.getDepositAmount(),
+                                orderItem.getSubtotal(),
+                                orderItem.getStartDate(),
+                                orderItem.getEndDate(),
+                                orderItem.getReturnStatus()
+                        )
+                );
             }
         }
 
         return sales;
+    }
+
+    public UserProfileFamilyDTO getFamilyProfile(Integer userId) {
+        User user = getUserOrThrow(userId);
+
+        return new UserProfileFamilyDTO(
+                getBasicProfile(userId),
+                user.getFamilyMembers()
+                        .stream()
+                        .map(f -> new FamilyMemberDTO(
+                                f.getName(),
+                                f.getAge(),
+                                f.getRelation()
+                        ))
+                        .toList()
+        );
+    }
+    public UserProfileVotesDTO getVotesProfile(Integer userId) {
+        User user = getUserOrThrow(userId);
+
+        return new UserProfileVotesDTO(
+                getBasicProfile(userId),
+                mapVotes(user)
+        );
+    }
+    public UserProfileEventsDTO getEventsProfile(Integer userId) {
+        getUserOrThrow(userId);
+
+        return new UserProfileEventsDTO(
+                getBasicProfile(userId),
+                getParticipatedEvents(userId),
+                eventRepository.findByCreatorId(userId)
+                        .stream()
+                        .map(e -> new UserEventDTO(
+                                e.getId(),
+                                e.getTitle(),
+                                e.getDate(),
+                                e.getStatus(),
+                                e.getLocation()
+                        ))
+                        .toList()
+        );
+    }
+    public UserProfileInitiativesDTO getInitiativesProfile(Integer userId) {
+        getUserOrThrow(userId);
+
+        return new UserProfileInitiativesDTO(
+                getBasicProfile(userId),
+                getParticipatedInitiatives(userId),
+                initiativeRepository.findByCreatorId(userId)
+                        .stream()
+                        .map(i -> new UserInitiativeDTO(
+                                i.getId(),
+                                i.getTitle(),
+                                i.getDate(),
+                                i.getStatus(),
+                                i.getCategory()
+                        ))
+                        .toList()
+        );
+    }
+    public UserProfileReviewsDTO getReviewsProfile(Integer userId) {
+        User user = getUserOrThrow(userId);
+
+        List<UserReviewDTO> writtenReviews =
+                user.getReviews()
+                        .stream()
+                        .map(r -> new UserReviewDTO(
+                                r.getId(),
+                                r.getRating(),
+                                r.getComment(),
+                                r.getCreatedAt(),
+                                r.getUser().getFullName()
+                        ))
+                        .toList();
+
+        return new UserProfileReviewsDTO(
+                getBasicProfile(userId),
+                writtenReviews,
+                new ArrayList<>()
+        );
+    }
+    public UserProfileIssuesDTO getIssuesProfile(Integer userId) {
+        User user = getUserOrThrow(userId);
+
+        List<UserIssueDTO> reports = getUserIssues(user);
+
+        Integer completed =
+                (int) reports.stream()
+                        .filter(r -> "COMPLETED".equalsIgnoreCase(r.getStatus()))
+                        .count();
+
+        Integer open =
+                reports.size() - completed;
+
+        return new UserProfileIssuesDTO(
+                getBasicProfile(userId),
+                reports.size(),
+                open,
+                completed,
+                reports
+        );
     }
 }

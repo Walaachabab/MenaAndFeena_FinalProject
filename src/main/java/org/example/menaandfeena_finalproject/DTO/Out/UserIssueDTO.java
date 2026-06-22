@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserIssueDTO {
-
     private Integer id;
 
     private String title;
