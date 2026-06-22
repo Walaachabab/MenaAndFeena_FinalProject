@@ -6,12 +6,15 @@ import org.example.menaandfeena_finalproject.DTO.In.ReviewInDTO;
 import org.example.menaandfeena_finalproject.DTO.Out.ReviewOutDTO;
 import org.example.menaandfeena_finalproject.Model.Event;
 import org.example.menaandfeena_finalproject.Model.Initiative;
+import org.example.menaandfeena_finalproject.Model.MarketPlaceItem;
+import org.example.menaandfeena_finalproject.Model.OrderItem;
 import org.example.menaandfeena_finalproject.Model.Review;
 import org.example.menaandfeena_finalproject.Model.User;
 import org.example.menaandfeena_finalproject.Repository.EventRepository;
 import org.example.menaandfeena_finalproject.Repository.EventRegistrationRepository;
 import org.example.menaandfeena_finalproject.Repository.InitiativeRepository;
 import org.example.menaandfeena_finalproject.Repository.InitiativeParticipationRepository;
+import org.example.menaandfeena_finalproject.Repository.OrderItemRepository;
 import org.example.menaandfeena_finalproject.Repository.ReviewRepository;
 import org.example.menaandfeena_finalproject.Repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -29,6 +32,7 @@ public class ReviewService {
     private final InitiativeRepository initiativeRepository;
     private final EventRegistrationRepository eventRegistrationRepository;
     private final InitiativeParticipationRepository initiativeParticipationRepository;
+    private final OrderItemRepository orderItemRepository;
     private final OpenAIService openAIService;
 
 
@@ -133,6 +137,63 @@ public class ReviewService {
         review.setUser(user);
         review.setInitiative(initiative);
         reviewRepository.save(review);
+    }
+
+    public void addMarketplaceSellerReview(Integer userId, Integer orderItemId, ReviewInDTO reviewInDTO) {
+        User buyer = userRepository.findUserById(userId);
+        if (buyer == null) {
+            throw new ApiException("User not found");
+        }
+
+        OrderItem orderItem = orderItemRepository.findOrderItemById(orderItemId);
+        if (orderItem == null) {
+            throw new ApiException("Order item not found");
+        }
+        if (orderItem.getOrders() == null || orderItem.getOrders().getUser() == null) {
+            throw new ApiException("Order item order is required");
+        }
+        if (!orderItem.getOrders().getUser().getId().equals(userId)) {
+            throw new ApiException("You can only review sellers from your own orders");
+        }
+        if (!"PAID".equals(orderItem.getOrders().getStatus()) && !"COMPLETED".equals(orderItem.getOrders().getStatus())) {
+            throw new ApiException("Order must be paid before reviewing the seller");
+        }
+
+        MarketPlaceItem item = orderItem.getMarketPlaceItem();
+        if (item == null) {
+            throw new ApiException("Marketplace item not found");
+        }
+        User seller = item.getUser();
+        if (seller == null) {
+            throw new ApiException("Seller not found");
+        }
+        if (seller.getId().equals(userId)) {
+            throw new ApiException("You cannot review yourself");
+        }
+        if (reviewRepository.existsByOrderItemId(orderItemId)) {
+            throw new ApiException("Seller already reviewed for this order item");
+        }
+
+        Review review = new Review();
+        review.setComment(reviewInDTO.getComment());
+        review.setRating(reviewInDTO.getRating());
+        review.setCreatedAt(LocalDate.now());
+        review.setUser(buyer);
+        review.setTargetUser(seller);
+        review.setOrderItem(orderItem);
+        reviewRepository.save(review);
+    }
+
+    public List<ReviewOutDTO> getSellerReviews(Integer sellerId) {
+        User seller = userRepository.findUserById(sellerId);
+        if (seller == null) {
+            throw new ApiException("Seller not found");
+        }
+
+        return reviewRepository.findByTargetUserId(sellerId)
+                .stream()
+                .map(this::convertToOutDTO)
+                .toList();
     }
 
 

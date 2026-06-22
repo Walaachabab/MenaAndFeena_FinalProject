@@ -6,7 +6,6 @@ import org.example.menaandfeena_finalproject.Api.ApiResponse;
 import org.example.menaandfeena_finalproject.DTO.In.IssueReportInDTO;
 import org.example.menaandfeena_finalproject.Model.User;
 import org.example.menaandfeena_finalproject.Service.IssueReportService;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -106,17 +105,6 @@ public class IssueReportController {
     public ResponseEntity<?> searchUserIssueReports(@AuthenticationPrincipal User user,
                                                     @RequestParam String keyword) {
         return ResponseEntity.status(200).body(issueReportService.searchUserIssueReports(user.getId(), keyword));
-    }
-
-    @GetMapping("/mayor-report/pdf")
-    public ResponseEntity<?> generateMayorIssueReportPdf(@AuthenticationPrincipal User user) {
-        byte[] pdfBytes = issueReportService.generateMayorIssueReportPdf(user.getId());
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"Neighborhood-Issue-Report.pdf\"");
-
-        return ResponseEntity.status(200).headers(headers).body(pdfBytes);
     }
 
     @PostMapping("/mayor-report/pdf/email")

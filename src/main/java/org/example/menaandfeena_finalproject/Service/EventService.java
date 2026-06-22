@@ -5,10 +5,13 @@ import org.example.menaandfeena_finalproject.Api.ApiException;
 import org.example.menaandfeena_finalproject.DTO.In.EventInDTO;
 import org.example.menaandfeena_finalproject.Model.Event;
 import org.example.menaandfeena_finalproject.Model.FamilyMember;
+import org.example.menaandfeena_finalproject.Model.Initiative;
 import org.example.menaandfeena_finalproject.Repository.EventRepository;
 import org.example.menaandfeena_finalproject.Repository.FamilyMemberRepository;
+import org.example.menaandfeena_finalproject.Repository.InitiativeRepository;
 import org.example.menaandfeena_finalproject.Repository.UserRepository;
 import org.springframework.stereotype.Service;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,6 +24,7 @@ public class EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final FamilyMemberRepository familyMemberRepository;
+    private final InitiativeRepository initiativeRepository;
     private final OpenAIService openAIService;
 
     public List<Event> getAllEvents() {
@@ -216,6 +220,143 @@ public class EventService {
         );
 
         return aiRecommendation;
+    }
+
+    public String generateWeekendFamilyPlan(Integer userId) {
+
+        User user = userRepository.findUserById(userId);
+
+        if (user == null) {
+            throw new ApiException("User not found");
+        }
+
+        List<FamilyMember> familyMembers = familyMemberRepository.findByUserId(userId);
+        LocalDate today = LocalDate.now();
+        LocalDate weekendStart = getUpcomingWeekendStart(today);
+        LocalDate weekendEnd = weekendStart.getDayOfWeek() == DayOfWeek.FRIDAY ? weekendStart.plusDays(1) : weekendStart;
+        LocalDateTime weekendStartDateTime = weekendStart.atStartOfDay();
+        LocalDateTime weekendEndDateTime = weekendEnd.atTime(23, 59, 59);
+
+        Integer userNeighborhoodId = user.getNeighborhood() == null ? null : user.getNeighborhood().getId();
+
+        List<Event> upcomingEvents = eventRepository.findEventsByDateBetween(weekendStartDateTime, weekendEndDateTime)
+                .stream()
+                .filter(event -> "ACTIVE".equals(event.getStatus()))
+                .filter(event -> userNeighborhoodId == null
+                        || event.getNeighborhood() == null
+                        || event.getNeighborhood().getId().equals(userNeighborhoodId))
+                .toList();
+
+        List<Initiative> upcomingInitiatives = initiativeRepository.findInitiativesByDateAfter(weekendStart.minusDays(1))
+                .stream()
+                .filter(initiative -> initiative.getDate() != null && !initiative.getDate().isAfter(weekendEnd))
+                .filter(initiative -> "ACTIVE".equals(initiative.getStatus()))
+                .filter(initiative -> userNeighborhoodId == null
+                        || initiative.getNeighborhood() == null
+                        || initiative.getNeighborhood().getId().equals(userNeighborhoodId))
+                .toList();
+
+        if (upcomingEvents.isEmpty() && upcomingInitiatives.isEmpty()) {
+            throw new ApiException("No upcoming events or initiatives found for the weekend plan");
+        }
+
+        StringBuilder prompt = new StringBuilder();
+
+        prompt.append("Family Members:\n");
+        if (familyMembers.isEmpty()) {
+            prompt.append("- Main user only. No family members are registered.\n");
+        } else {
+            for (FamilyMember member : familyMembers) {
+                prompt.append("- Name: ")
+                        .append(member.getName())
+                        .append(" | Age: ")
+                        .append(member.getAge())
+                        .append(" | Gender: ")
+                        .append(member.getGender())
+                        .append(" | Relation: ")
+                        .append(member.getRelation())
+                        .append("\n");
+            }
+        }
+
+        prompt.append("\nUpcoming Events:\n");
+        for (Event event : upcomingEvents) {
+            prompt.append("- ID ")
+                    .append(event.getId())
+                    .append(" | ")
+                    .append(event.getTitle())
+                    .append(" | Date: ")
+                    .append(event.getDate())
+                    .append(" | Location: ")
+                    .append(event.getLocation())
+                    .append(" | Paid: ")
+                    .append(event.getIsPaid())
+                    .append(" | Price: ")
+                    .append(event.getPrice())
+                    .append(" | Description: ")
+                    .append(event.getDescription())
+                    .append("\n");
+        }
+
+        prompt.append("\nUpcoming Initiatives:\n");
+        for (Initiative initiative : upcomingInitiatives) {
+            prompt.append("- ID ")
+                    .append(initiative.getId())
+                    .append(" | ")
+                    .append(initiative.getTitle())
+                    .append(" | Date: ")
+                    .append(initiative.getDate())
+                    .append(" | Category: ")
+                    .append(initiative.getCategory())
+                    .append(" | Description: ")
+                    .append(initiative.getDescription())
+                    .append("\n");
+        }
+
+        String weekendPlan = openAIService.askAI(
+                """
+                You are an AI family activity planner for a smart neighborhood platform.
+                Build a practical weekend plan using only the provided events and initiatives.
+                Rules:
+                - Use a friendly Arabic tone.
+                - Choose activities suitable for the family members' ages and relations.
+                - Include a Friday plan and a Saturday plan.
+                - Mention event or initiative titles exactly as provided.
+                - Do not invent activities, locations, prices, or dates.
+                - If there are not enough activities, create a lighter plan instead of inventing.
+                - Keep the plan concise.
+                Return only this format:
+                Friday:
+                - Morning: <activity title> | <why it fits>
+                - Evening: <activity title> | <why it fits>
+
+                Saturday:
+                - Morning: <activity title> | <why it fits>
+                - Evening: <activity title> | <why it fits>
+
+                Notes:
+                - <short practical note>
+                """,
+                prompt.toString()
+        );
+
+        if (weekendPlan == null || weekendPlan.isBlank() || "ERROR_FALLBACK".equals(weekendPlan)) {
+            throw new ApiException("AI weekend planner failed. Please try again later");
+        }
+
+        return weekendPlan;
+    }
+
+    private LocalDate getUpcomingWeekendStart(LocalDate today) {
+        if (today.getDayOfWeek() == DayOfWeek.FRIDAY) {
+            return today;
+        }
+
+        LocalDate date = today;
+        while (date.getDayOfWeek() != DayOfWeek.FRIDAY) {
+            date = date.plusDays(1);
+        }
+        return date;
     }
 
 

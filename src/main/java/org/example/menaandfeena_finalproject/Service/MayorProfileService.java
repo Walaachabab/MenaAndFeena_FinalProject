@@ -556,6 +556,142 @@ public void sendPerformanceReport(Integer mayorId) {
         );
     }
 
+    public String getInitiativeSuggestions(Integer mayorId) {
+
+        User mayor = validateMayor(mayorId);
+
+        if (mayor.getNeighborhood() == null) {
+            throw new ApiException("Mayor is not assigned to a neighborhood");
+        }
+
+        Integer neighborhoodId = mayor.getNeighborhood().getId();
+
+        List<IssueReport> reports =
+                issueReportRepository.findByReportNeighborhood_Id(neighborhoodId);
+
+        List<Review> reviews =
+                reviewRepository.findByUser_Neighborhood_Id(neighborhoodId);
+
+        List<Event> events =
+                eventRepository.findByNeighborhood_Id(neighborhoodId);
+
+        List<Initiative> initiatives =
+                initiativeRepository.findByNeighborhood_Id(neighborhoodId);
+
+        double averageRating =
+                reviews.stream()
+                        .mapToInt(Review::getRating)
+                        .average()
+                        .orElse(0);
+
+        long urgentReports =
+                reports.stream()
+                        .filter(report -> "URGENT".equals(report.getPriority()))
+                        .count();
+
+        long openReports =
+                reports.stream()
+                        .filter(report -> !"COMPLETED".equals(report.getStatus()))
+                        .count();
+
+        StringBuilder issueSummary = new StringBuilder();
+        for (IssueReport report : reports) {
+            issueSummary.append("- ")
+                    .append(report.getTitle())
+                    .append(" | Category: ")
+                    .append(report.getCategory())
+                    .append(" | Priority: ")
+                    .append(report.getPriority())
+                    .append(" | Status: ")
+                    .append(report.getStatus())
+                    .append("\n");
+        }
+
+        StringBuilder recentEvents = new StringBuilder();
+        for (Event event : events) {
+            recentEvents.append("- ")
+                    .append(event.getTitle())
+                    .append(" | Status: ")
+                    .append(event.getStatus())
+                    .append(" | Date: ")
+                    .append(event.getDate())
+                    .append("\n");
+        }
+
+        StringBuilder recentInitiatives = new StringBuilder();
+        for (Initiative initiative : initiatives) {
+            recentInitiatives.append("- ")
+                    .append(initiative.getTitle())
+                    .append(" | Category: ")
+                    .append(initiative.getCategory())
+                    .append(" | Status: ")
+                    .append(initiative.getStatus())
+                    .append(" | Date: ")
+                    .append(initiative.getDate())
+                    .append("\n");
+        }
+
+        String suggestions = openAIService.askAI(
+                """
+                You are an AI advisor for a neighborhood mayor.
+                Suggest practical initiatives that improve resident happiness, appreciation, and trust in the mayor.
+                Rules:
+                - Write in Arabic.
+                - Use only the provided neighborhood data.
+                - Focus on initiatives the mayor can realistically create in the app.
+                - Include appreciation/community ideas, not only maintenance fixes.
+                - Do not invent exact statistics.
+                - Keep it concise and actionable.
+                Return exactly this format:
+                Overall insight:
+                <one short paragraph>
+
+                Suggested initiatives:
+                1. <initiative name> | Goal: <goal> | Why: <reason> | Target residents: <target>
+                2. <initiative name> | Goal: <goal> | Why: <reason> | Target residents: <target>
+                3. <initiative name> | Goal: <goal> | Why: <reason> | Target residents: <target>
+
+                Appreciation idea:
+                <one idea to make residents feel appreciated>
+                """,
+                """
+                Neighborhood: %s
+                Average rating: %.2f/5
+                Total issue reports: %s
+                Open issue reports: %s
+                Urgent issue reports: %s
+                Total events: %s
+                Total initiatives: %s
+
+                Issue reports:
+                %s
+
+                Events:
+                %s
+
+                Initiatives:
+                %s
+                """.formatted(
+                        mayor.getNeighborhood().getName(),
+                        averageRating,
+                        reports.size(),
+                        openReports,
+                        urgentReports,
+                        events.size(),
+                        initiatives.size(),
+                        issueSummary,
+                        recentEvents,
+                        recentInitiatives
+                )
+        );
+
+        if (suggestions == null || suggestions.isBlank() || "ERROR_FALLBACK".equals(suggestions)) {
+            throw new ApiException("AI initiative suggestions failed. Please try again later");
+        }
+
+        return suggestions;
+    }
+
 
     // SCORE
     private double score(List<IssueReport> reports, String category) {

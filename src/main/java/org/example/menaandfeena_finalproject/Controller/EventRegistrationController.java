@@ -80,14 +80,16 @@ public class EventRegistrationController {
         return ResponseEntity.status(200).body(new ApiResponse("Family member registered successfully"));
     }
 
-    @GetMapping("/my/{userId}")
-    public ResponseEntity<?> getMyEventRegistrations(@PathVariable Integer userId) {
-        return ResponseEntity.status(200).body(eventRegistrationService.getMyEventRegistrations(userId));
+    @GetMapping("/my")
+    public ResponseEntity<?> getMyEventRegistrations(Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        return ResponseEntity.status(200).body(eventRegistrationService.getMyEventRegistrations(user.getId()));
     }
 
-    @GetMapping("/event/{eventId}/attendees/{ownerId}")
-    public ResponseEntity<?> getEventAttendees(@PathVariable Integer eventId, @PathVariable Integer ownerId) {
-        return ResponseEntity.status(200).body(eventRegistrationService.getEventAttendees(eventId, ownerId));
+    @GetMapping("/event/{eventId}/attendees")
+    public ResponseEntity<?> getEventAttendees(Authentication authentication, @PathVariable Integer eventId) {
+        User user = (User) authentication.getPrincipal();
+        return ResponseEntity.status(200).body(eventRegistrationService.getEventAttendees(eventId, user.getId()));
     }
 
 }

@@ -111,6 +111,15 @@ public class MayorProfileController {
         );
     }
 
+    @GetMapping("/initiative-suggestions")
+    public ResponseEntity<?> getInitiativeSuggestions(
+            @AuthenticationPrincipal User user
+    ) {
+        return ResponseEntity.status(200).body(
+                mayorProfileService.getInitiativeSuggestions(user.getId())
+        );
+    }
+
     @PostMapping("/resend-appointment-email")
     public ResponseEntity<?> resendMayorAppointmentEmail(
             @AuthenticationPrincipal User user

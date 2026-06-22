@@ -100,6 +100,14 @@ public class EventController {
         return ResponseEntity.status(200).body(eventService.recommendEventForUser(user.getId()));
     }
 
+    @GetMapping("/weekend-plan")
+    public ResponseEntity<?> generateWeekendFamilyPlan(Authentication authentication) {
+
+        User user = (User) authentication.getPrincipal();
+
+        return ResponseEntity.status(200).body(eventService.generateWeekendFamilyPlan(user.getId()));
+    }
+
 
 
 

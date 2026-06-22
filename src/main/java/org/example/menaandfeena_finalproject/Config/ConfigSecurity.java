@@ -92,10 +92,10 @@ public class ConfigSecurity {
                                 "/api/v1/election-rounds/delete/**",
                                 "/api/v1/mayor-candidates/update/**",
                                 "/api/v1/mayor-candidates/delete/**",
-                                "/api/v1/mayor-profiles/get-all",
-                                "/api/v1/mayor-profiles/add",
-                                "/api/v1/mayor-profiles/update/**",
-                                "/api/v1/mayor-profiles/delete/**",
+                                "/api/v1/mayor-profile/get",
+                                "/api/v1/mayor-profile/add",
+                                "/api/v1/mayor-profile/update/**",
+                                "/api/v1/mayor-profile/delete/**",
                                 "/api/v1/mayor-votes/get-all",
                                 "/api/v1/mayor-votes/delete/**",
                                 "/api/v1/neighborhoods/get-all",
@@ -127,6 +127,14 @@ public class ConfigSecurity {
                                 "/api/v1/marketplace-images/add",
                                 "/api/v1/marketplace-images/upload/**",
                                 "/api/v1/marketplace-images/get",
+                                "/api/v1/payment/get",
+                                "/api/v1/payment/delete/**",
+                                "/api/v1/payment/get-status/**",
+                                "/api/v1/announcement/test-openai",
+                                "/api/v1/review/get",
+                                "/api/v1/review/add",
+                                "/api/v1/review/update/**",
+                                "/api/v1/review/delete/**",
                                 "/api/v1/insurance/**"
                         ).hasAuthority("ADMIN")
 
@@ -135,8 +143,14 @@ public class ConfigSecurity {
                         // =========================
 
                         .requestMatchers(
-                                "/api/v1/mayor-profiles/**",
                                 "/api/v1/mayor-reports/**",
+                                "/api/v1/mayor-profile/analytics",
+                                "/api/v1/mayor-profile/reports",
+                                "/api/v1/mayor-profile/weekly",
+                                "/api/v1/mayor-profile/performance",
+                                "/api/v1/mayor-profile/satisfaction",
+                                "/api/v1/mayor-profile/initiative-suggestions",
+                                "/api/v1/mayor-profile/resend-appointment-email",
                                 "/api/v1/issue-reports/mayor-report/**",
                                 "/api/v1/issue-reports/{id}/start-progress",
                                 "/api/v1/issue-reports/{id}/complete"
@@ -179,24 +193,10 @@ public class ConfigSecurity {
                                 "/api/v1/event-registration/**",
                                 "/api/v1/initiative/**",
                                 "/api/v1/initiative-participation/**",
+                                "/api/v1/payment/card",
                                 "/api/v1/payment/pay-event/**",
                                 "/api/v1/payment/invoice-pdf/**"
                         ).hasAnyAuthority("USER", "MAYOR")
-
-                        // =========================
-                        // MAYOR ONLY
-                        // =========================
-
-                        .requestMatchers(
-                                "/api/v1/mayor-profiles/**",
-                                "/api/v1/mayor-reports/**",
-                                "/api/v1/mayor-profiles/analytics",
-                                "/api/v1/mayor-profiles/reports",
-                                "/api/v1/mayor-profiles/weekly",
-                                "/api/v1/mayor-profiles/performance",
-                                "/api/v1/mayor-profiles/satisfaction",
-                                "/api/v1/mayor-profiles/resend-appointment-email"
-                        ).hasAuthority("MAYOR")
 
                         .anyRequest().authenticated()
                 )

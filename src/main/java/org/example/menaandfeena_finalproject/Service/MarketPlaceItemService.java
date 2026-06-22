@@ -6,18 +6,22 @@ import lombok.RequiredArgsConstructor;
 import org.example.menaandfeena_finalproject.Api.ApiException;
 import org.example.menaandfeena_finalproject.DTO.In.MarketPlaceItemInDTO;
 import org.example.menaandfeena_finalproject.DTO.Out.MarketPlaceItemOutDTO;
+import org.example.menaandfeena_finalproject.DTO.Out.MarketplaceSellerSummaryOutDTO;
 import org.example.menaandfeena_finalproject.DTO.Out.MarketplaceRecommendationOutDTO;
 import org.example.menaandfeena_finalproject.Model.Cart;
 import org.example.menaandfeena_finalproject.Model.CartItem;
+import org.example.menaandfeena_finalproject.Model.Inquiry;
 import org.example.menaandfeena_finalproject.Model.MarketPlaceItem;
 import org.example.menaandfeena_finalproject.Model.OrderItem;
 import org.example.menaandfeena_finalproject.Model.Orders;
 import org.example.menaandfeena_finalproject.Model.User;
 import org.example.menaandfeena_finalproject.Repository.CartItemRepository;
 import org.example.menaandfeena_finalproject.Repository.CartRepository;
+import org.example.menaandfeena_finalproject.Repository.InquiryRepository;
 import org.example.menaandfeena_finalproject.Repository.MarketPlaceItemRepository;
 import org.example.menaandfeena_finalproject.Repository.OrderItemRepository;
 import org.example.menaandfeena_finalproject.Repository.OrderRepository;
+import org.example.menaandfeena_finalproject.Repository.ReviewRepository;
 import org.example.menaandfeena_finalproject.Repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +37,8 @@ public class MarketPlaceItemService {
     private final OrderItemRepository orderItemRepository;
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
+    private final InquiryRepository inquiryRepository;
+    private final ReviewRepository reviewRepository;
     private final OpenAIService openAIService;
 
     public List<MarketPlaceItemOutDTO> getAllMarketPlaceItems() {
@@ -254,6 +260,52 @@ public class MarketPlaceItemService {
         Integer itemUserId = marketPlaceItem.getUser().getId();
         String sellerFullName = marketPlaceItem.getUser().getFullName();
         return new MarketPlaceItemOutDTO(marketPlaceItem.getId(), marketPlaceItem.getTitle(), marketPlaceItem.getDescription(), marketPlaceItem.getType(), marketPlaceItem.getStatus(), marketPlaceItem.getPrice(), marketPlaceItem.getRentPrice(), marketPlaceItem.getDepositAmount(), marketPlaceItem.getQuantity(), itemUserId, sellerFullName);
+    }
+
+    public MarketplaceSellerSummaryOutDTO getSellerSummaryForItem(Integer marketPlaceItemId, Integer userId) {
+        User requester = userRepository.findUserById(userId);
+        if (requester == null) {
+            throw new ApiException("User not found");
+        }
+        if (requester.getNeighborhood() == null) {
+            throw new ApiException("User neighborhood is required");
+        }
+
+        MarketPlaceItem item = marketPlaceItemRepository.findMarketPlaceItemById(marketPlaceItemId);
+        if (item == null) {
+            throw new ApiException("Market place item not found");
+        }
+        User seller = item.getUser();
+        if (seller == null) {
+            throw new ApiException("Seller not found");
+        }
+        if (seller.getNeighborhood() == null) {
+            throw new ApiException("Seller neighborhood is required");
+        }
+        if (!seller.getNeighborhood().getId().equals(requester.getNeighborhood().getId())) {
+            throw new ApiException("Seller is outside your neighborhood");
+        }
+
+        Double averageRating = reviewRepository.getAverageRatingByTargetUserId(seller.getId());
+        Double roundedAverageRating = averageRating == null ? 0.0 : Math.round(averageRating * 10.0) / 10.0;
+        Long completedPurchases = orderItemRepository.countCompletedPurchasesBySellerId(seller.getId());
+        Inquiry openInquiry = inquiryRepository.findInquiryByRequesterAndTargetUserAndMarketPlaceItemAndStatus(
+                requester,
+                seller,
+                item,
+                "OPEN"
+        );
+
+        return new MarketplaceSellerSummaryOutDTO(
+                seller.getId(),
+                seller.getFullName(),
+                roundedAverageRating,
+                String.format("%.1f/5", roundedAverageRating),
+                seller.getCreatedAt(),
+                completedPurchases == null ? 0L : completedPurchases,
+                openInquiry != null,
+                openInquiry == null ? null : openInquiry.getId()
+        );
     }
 
     public List<MarketPlaceItemOutDTO> getMarketPlaceItemsByType(String type) {
