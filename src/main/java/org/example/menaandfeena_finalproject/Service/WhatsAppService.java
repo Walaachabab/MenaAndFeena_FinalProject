@@ -33,14 +33,33 @@ public class WhatsAppService {
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
 
-        // TODO: This sends the WhatsApp message once without reading the response.
-        // Later we should remove this call and keep only the call below to avoid sending duplicate messages.
-        restTemplate.postForEntity(url, request, String.class);
-
+        // نرسل الرسالة مرة واحدة فقط لتجنّب تكرار الإرسال (كان هناك استدعاء مكرر سابقاً).
         ResponseEntity<String> response =
                 restTemplate.postForEntity(url, request, String.class);
 
         System.out.println("WHATSAPP RESPONSE = " + response.getBody());
 
+    }
+
+    // يرسل ملف PDF (أو أي مستند) عبر واتساب باستخدام endpoint المستندات في UltraMsg.
+    // الـ document يقبل رابطاً عاماً أو محتوى base64 بصيغة data URI مثل: data:application/pdf;base64,XXXX
+    public void sendWhatsAppDocument(String to, String filename, String document, String caption) {
+        String url = "https://api.ultramsg.com/" + instanceId + "/messages/document";
+
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("token", token);
+        body.add("to", to);
+        body.add("filename", filename);
+        body.add("document", document);
+        body.add("caption", caption);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
+
+        ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+
+        System.out.println("WHATSAPP DOCUMENT RESPONSE = " + response.getBody());
     }
 }
