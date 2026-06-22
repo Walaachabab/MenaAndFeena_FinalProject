@@ -2,11 +2,11 @@ package org.example.menaandfeena_finalproject.Controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.example.menaandfeena_finalproject.Api.ApiResponse;
 import org.example.menaandfeena_finalproject.DTO.In.EventRegistrationInDTO;
 import org.example.menaandfeena_finalproject.Service.EventRegistrationService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.example.menaandfeena_finalproject.Model.User;
 
