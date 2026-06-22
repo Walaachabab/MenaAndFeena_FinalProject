@@ -81,7 +81,6 @@ public class ReviewService {
         if (user == null) {
             throw new ApiException("User not found");
         }
-        System.out.println("JWT USER ID = " + userId);
         Event event = eventRepository.findEventById(eventId);
 
         if (event == null) {
@@ -347,14 +346,8 @@ public Double getAverageRatingByInitiative(Integer initiativeId) {
     }
 
 
-
-
-
-
 }
 
-// oldReview.setUser(review.getUser());
-//oldReview.setEvent(review.getEvent());
-// oldReview.setInitiative(review.getInitiative());
+
 
 

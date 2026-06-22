@@ -19,5 +19,5 @@ public interface EventRegistrationRepository extends JpaRepository<EventRegistra
     int countByUserIdAndStatus(Integer id, String confirmed);
 
     // داخل كلاس EventRegistrationRepository
-    List<EventRegistration> findByUserId(Integer userId); // 👈 تأكدي أن نوع الإرجاع List وليس void
+    List<EventRegistration> findByUserId(Integer userId); //
 }
