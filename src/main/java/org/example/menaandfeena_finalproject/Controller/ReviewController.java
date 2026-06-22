@@ -93,6 +93,20 @@ public class ReviewController {
         return ResponseEntity.status(200).body(new ApiResponse("Initiative review added successfully"));
     }
 
+    @PostMapping("/marketplace/order-item/{orderItemId}")
+    public ResponseEntity<?> addMarketplaceSellerReview(Authentication authentication,
+                                                       @PathVariable Integer orderItemId,
+                                                       @Valid @RequestBody ReviewInDTO reviewInDTO) {
+        User user = (User) authentication.getPrincipal();
+        reviewService.addMarketplaceSellerReview(user.getId(), orderItemId, reviewInDTO);
+        return ResponseEntity.status(200).body(new ApiResponse("Seller review added successfully"));
+    }
+
+    @GetMapping("/seller/{sellerId}")
+    public ResponseEntity<?> getSellerReviews(@PathVariable Integer sellerId) {
+        return ResponseEntity.status(200).body(reviewService.getSellerReviews(sellerId));
+    }
+
 
 
 

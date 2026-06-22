@@ -27,6 +27,17 @@ public class PdfInvoiceService {
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         PaymentInvoiceDTO invoice = paymentService.getPaymentInvoice(paymentId);
+        return generateInvoicePdf(invoice, out);
+    }
+
+    public byte[] generateInvoiceForUser(String paymentId, Integer userId) throws Exception {
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        PaymentInvoiceDTO invoice = paymentService.getPaymentInvoiceForUser(paymentId, userId);
+        return generateInvoicePdf(invoice, out);
+    }
+
+    private byte[] generateInvoicePdf(PaymentInvoiceDTO invoice, ByteArrayOutputStream out) throws Exception {
 
         Document document = new Document();
 

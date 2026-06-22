@@ -48,8 +48,14 @@ public class MarketPlaceItemController {
 
     @GetMapping("/user/item/{id}")
     public ResponseEntity<?> getMarketPlaceItemByIdForUser(@PathVariable Integer id,
-                                                           @AuthenticationPrincipal User user) {
+                                                            @AuthenticationPrincipal User user) {
         return ResponseEntity.status(200).body(marketPlaceItemService.getMarketPlaceItemByIdForUser(id, user.getId()));
+    }
+
+    @GetMapping("/user/item/{id}/seller-summary")
+    public ResponseEntity<?> getSellerSummaryForItem(@PathVariable Integer id,
+                                                     @AuthenticationPrincipal User user) {
+        return ResponseEntity.status(200).body(marketPlaceItemService.getSellerSummaryForItem(id, user.getId()));
     }
 
     @GetMapping("/{marketPlaceItemId}/similar")

@@ -66,10 +66,7 @@ public class ConfigSecurity {
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/v1/users/welcome",
-                                "/api/v1/users/about"
-                        ).permitAll()
-
-                        .requestMatchers(
+                                "/api/v1/users/about",
                                 "/api/v1/payment/callback"
                         ).permitAll()
 
@@ -104,16 +101,17 @@ public class ConfigSecurity {
                                 "/api/v1/mayor-votes/get-all",
                                 "/api/v1/mayor-votes/delete/**",
 
-                                "/api/v1/mayor-profiles/get-all",
-                                "/api/v1/mayor-profiles/add",
-                                "/api/v1/mayor-profiles/update/**",
-                                "/api/v1/mayor-profiles/delete/**",
+                                "/api/v1/mayor-profile/get",
+                                "/api/v1/mayor-profile/add",
+                                "/api/v1/mayor-profile/update/**",
+                                "/api/v1/mayor-profile/delete/**",
 
                                 "/api/v1/issue-reports/get-all",
                                 "/api/v1/issue-reports/admin/**",
                                 "/api/v1/issue-reports/status/**",
                                 "/api/v1/issue-reports/priority/**",
                                 "/api/v1/issue-reports/category/**",
+                                "/api/v1/issue-reports/admin/neighborhood/**",
                                 "/api/v1/issue-reports/search",
                                 "/api/v1/issue-reports/delete/**",
 
@@ -126,14 +124,29 @@ public class ConfigSecurity {
                                 "/api/v1/cart-items/get",
                                 "/api/v1/cart-items/delete/**",
 
+                                "/api/v1/order-items/add",
                                 "/api/v1/order-items/get",
                                 "/api/v1/order-items/update/**",
                                 "/api/v1/order-items/delete/**",
 
+                                "/api/v1/marketplace/get",
                                 "/api/v1/marketplace/admin/**",
-                                "/api/v1/marketplace-images/get",
+                                "/api/v1/marketplace/type/**",
+
                                 "/api/v1/marketplace-images/add",
                                 "/api/v1/marketplace-images/upload/**",
+                                "/api/v1/marketplace-images/get",
+
+                                "/api/v1/payment/get",
+                                "/api/v1/payment/delete/**",
+                                "/api/v1/payment/get-status/**",
+
+                                "/api/v1/announcement/test-openai",
+
+                                "/api/v1/review/get",
+                                "/api/v1/review/add",
+                                "/api/v1/review/update/**",
+                                "/api/v1/review/delete/**",
 
                                 "/api/v1/insurance/**"
                         ).hasAuthority("ADMIN")
@@ -144,28 +157,26 @@ public class ConfigSecurity {
                         // =========================
 
                         .requestMatchers(
-                                "/api/v1/mayor-profiles/analytics",
-                                "/api/v1/mayor-profiles/reports",
-                                "/api/v1/mayor-profiles/weekly",
-                                "/api/v1/mayor-profiles/performance",
-                                "/api/v1/mayor-profiles/satisfaction",
-                                "/api/v1/mayor-profiles/resend-appointment-email",
-
                                 "/api/v1/mayor-reports/**",
+
+                                "/api/v1/mayor-profile/analytics",
+                                "/api/v1/mayor-profile/reports",
+                                "/api/v1/mayor-profile/weekly",
+                                "/api/v1/mayor-profile/performance",
+                                "/api/v1/mayor-profile/satisfaction",
+                                "/api/v1/mayor-profile/initiative-suggestions",
+                                "/api/v1/mayor-profile/resend-appointment-email",
 
                                 "/api/v1/issue-reports/mayor-report/**",
                                 "/api/v1/issue-reports/*/start-progress",
                                 "/api/v1/issue-reports/*/complete"
                         ).hasAuthority("MAYOR")
-
-
                         // =========================
                         // USER + MAYOR
                         // =========================
 
                         .requestMatchers(
                                 "/api/v1/users/**",
-
                                 "/api/v1/family-members/**",
 
                                 "/api/v1/neighborhoods/dashboard",
@@ -205,11 +216,13 @@ public class ConfigSecurity {
                                 "/api/v1/initiative/**",
                                 "/api/v1/initiative-participation/**",
 
+                                "/api/v1/payment/card",
                                 "/api/v1/payment/pay-event/**",
                                 "/api/v1/payment/invoice-pdf/**"
                         ).hasAnyAuthority("USER", "MAYOR")
 
                         .anyRequest().authenticated()
+
                 )
 
                 .addFilterBefore(

@@ -87,9 +87,12 @@ public class AnnouncementController {
 
 
     @PostMapping("/moderate/{announcementId}")
-    public ResponseEntity<?> moderateAnnouncement(@PathVariable Integer announcementId) {
+    public ResponseEntity<?> moderateAnnouncement(Authentication authentication,
+                                                  @PathVariable Integer announcementId) {
 
-        announcementService.moderateAnnouncement(announcementId);
+        User user = (User) authentication.getPrincipal();
+
+        announcementService.moderateAnnouncement(announcementId, user.getId());
         return ResponseEntity.status(200).body(new ApiResponse("Announcement moderated successfully"));
     }
 

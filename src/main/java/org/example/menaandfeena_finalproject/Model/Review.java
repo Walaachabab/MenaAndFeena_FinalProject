@@ -49,4 +49,9 @@ public class Review {
     @JoinColumn(name = "target_user_id")
     private User targetUser;
 
+    @OneToOne
+    @JoinColumn(name = "order_item_id")
+    @JsonIgnore
+    private OrderItem orderItem;
+
 }

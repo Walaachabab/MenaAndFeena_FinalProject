@@ -99,10 +99,12 @@ public class PaymentController {
 
 
 
-   // Walaa
+    // Walaa
     @GetMapping("/invoice-pdf/{paymentId}")
-    public ResponseEntity<byte[]> generateInvoicePdf(@PathVariable String paymentId) throws Exception {
-        byte[] pdf = pdfInvoiceService.generateInvoice(paymentId);
+    public ResponseEntity<byte[]> generateInvoicePdf(Authentication authentication,
+                                                     @PathVariable String paymentId) throws Exception {
+        User user = (User) authentication.getPrincipal();
+        byte[] pdf = pdfInvoiceService.generateInvoiceForUser(paymentId, user.getId());
         return ResponseEntity.ok()
                 .header("Content-Disposition",
                         "inline; filename=invoice.pdf")

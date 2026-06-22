@@ -108,12 +108,19 @@ public class AnnouncementService {
 
     // Walaa
 
-    public void moderateAnnouncement(Integer announcementId) {
+    public void moderateAnnouncement(Integer announcementId, Integer userId) {
 
         Announcement announcement = announcementRepository.findAnnouncementById(announcementId);
 
         if (announcement == null) {
             throw new ApiException("Announcement not found");
+        }
+        User user = userRepository.findUserById(userId);
+        if (user == null) {
+            throw new ApiException("User not found");
+        }
+        if (announcement.getUser() == null || !announcement.getUser().getId().equals(userId)) {
+            throw new ApiException("Only the announcement owner can moderate announcement");
         }
 
         String aiResult = openAIService.askAI(
@@ -122,10 +129,15 @@ public class AnnouncementService {
                         "\nContent: " + announcement.getContent()
         );
 
-        announcement.setStatus(aiResult.trim().toUpperCase());
+        String moderationStatus = aiResult == null ? "" : aiResult.trim().toUpperCase();
+        if (!moderationStatus.equals("APPROVED") && !moderationStatus.equals("REJECTED")) {
+            throw new ApiException("AI moderation failed. Please try again later");
+        }
+
+        announcement.setStatus(moderationStatus);
         announcementRepository.save(announcement);
 
-        if (announcement.getStatus().equals("APPROVED")) {
+        if (moderationStatus.equals("APPROVED")) {
 
             String importanceResult = openAIService.askAI(
                     "You are an importance detection system for a neighborhood platform. " +

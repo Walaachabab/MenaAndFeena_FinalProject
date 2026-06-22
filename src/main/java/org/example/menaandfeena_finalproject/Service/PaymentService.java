@@ -328,4 +328,26 @@ public class PaymentService {
         }
     }
 
+    public PaymentInvoiceDTO getPaymentInvoiceForUser(String paymentId, Integer userId) {
+        Payment payment = paymentRepository.findPaymentByTransactionId(paymentId);
+
+        if (payment == null) {
+            throw new ApiException("Payment not found");
+        }
+
+        boolean ownsOrderPayment = payment.getOrders() != null
+                && payment.getOrders().getUser() != null
+                && payment.getOrders().getUser().getId().equals(userId);
+
+        boolean ownsEventPayment = payment.getEventRegistration() != null
+                && payment.getEventRegistration().getUser() != null
+                && payment.getEventRegistration().getUser().getId().equals(userId);
+
+        if (!ownsOrderPayment && !ownsEventPayment) {
+            throw new ApiException("You can only view your own payment invoice");
+        }
+
+        return getPaymentInvoice(paymentId);
+    }
+
 }
