@@ -56,152 +56,180 @@ https://www.figma.com/design/e3KckUskVxFWFs5o5K72JD/%D9%85%D9%86%D9%8B%D8%A7-%D9
 * Postman
 
 ---
-
 ## 📦 Modules Implemented
 
 ### Models
 
-* User
-* Neighborhood
-* FamilyMember
-* Landmark
-* ElectionRound
-* MayorCandidate
-* MayorProfile
-* MayorVote
+* Announcement
+* Event
+* EventRegistration
+* Initiative
+* InitiativeParticipation
+* Review
+* EventFeatures
+* EventSchedule
+* Ticket
 
-### Security
+### Tests JWT
 
-* JwtService
-* JwtAuthenticationFilter
-
----
-
-## 🔐 Authentication
-
-### Auth Controller
-
-| Feature  | Method | Endpoint                |
-| -------- | ------ | ----------------------- |
-| Register | POST   | `/api/v1/auth/register` |
-| Login    | POST   | `/api/v1/auth/login`    |
+* EventRegistrationRepositoryTest
+* InitiativeRepositoryTest
+* ReviewRepositoryTest
+* InitiativeServiceTest
+* ReviewServiceTest
 
 ---
 
-## 🗳 Election Round Controller
+## 📢 Announcement Controller
+
+| Feature                | Method | Endpoint                                                  |
+| ---------------------- | ------ | --------------------------------------------------------- |
+| Get All Announcements  | GET    | `/api/v1/announcement/get`                                |
+| Get My Announcements   | GET    | `/api/v1/announcement/my`                                 |
+| Create Announcement    | POST   | `/api/v1/announcement/create`                             |
+| Update Announcement    | PUT    | `/api/v1/announcement/update/{id}`                        |
+| Delete Announcement    | DELETE | `/api/v1/announcement/delete/{id}`                        |
+| Moderate Announcement  | POST   | `/api/v1/announcement/moderate/{announcementId}`          |
+| Search Announcements   | GET    | `/api/v1/announcement/search`                             |
+| Get Announcement By ID | GET    | `/api/v1/announcement/{id}`                               |
+| Contact Publisher      | GET    | `/api/v1/announcement/contact-publisher/{announcementId}` |
+| Test OpenAI            | GET    | `/api/v1/announcement/test-openai`                        |
+
+---
+
+## 🎉 Event Controller
+
+| Feature                      | Method | Endpoint                               |
+| ---------------------------- | ------ | -------------------------------------- |
+| Get All Events               | GET    | `/api/v1/event/get`                    |
+| Create Event                 | POST   | `/api/v1/event/create`                 |
+| Update Event                 | PUT    | `/api/v1/event/update/{id}`            |
+| Delete Event                 | DELETE | `/api/v1/event/delete/{id}`            |
+| Get Upcoming Events          | GET    | `/api/v1/event/upcoming`               |
+| Get Previous Events          | GET    | `/api/v1/event/previous`               |
+| Get Events By Date           | GET    | `/api/v1/event/date/{date}`            |
+| Get Event By ID              | GET    | `/api/v1/event/{id}`                   |
+| Get All Event Features       | GET    | `/api/v1/event/features`               |
+| Get Event Features           | GET    | `/api/v1/event/{eventId}/features`     |
+| Get Event Schedule           | GET    | `/api/v1/event/{eventId}/schedule`     |
+| Upload Event Image           | POST   | `/api/v1/event/{eventId}/upload-image` |
+| Recommend Event              | GET    | `/api/v1/event/recommend`              |
+| Generate Weekend Family Plan | GET    | `/api/v1/event/weekend-plan`           |
+
+---
+
+## 🎟 Event Registration Controller
+
+| Feature                     | Method | Endpoint                                                                |
+| --------------------------- | ------ | ----------------------------------------------------------------------- |
+| Get All Event Registrations | GET    | `/api/v1/event-registration/get`                                        |
+| Update Event Registration   | PUT    | `/api/v1/event-registration/update/{id}`                                |
+| Delete Event Registration   | DELETE | `/api/v1/event-registration/delete/{id}`                                |
+| Register To Event           | POST   | `/api/v1/event-registration/register/{eventId}`                         |
+| Register Family Member      | POST   | `/api/v1/event-registration/register-family/{familyMemberId}/{eventId}` |
+| Get My Event Registrations  | GET    | `/api/v1/event-registration/my`                                         |
+| Get Event Attendees         | GET    | `/api/v1/event-registration/event/{eventId}/attendees`                  |
+
+---
+
+## 📅 Event Schedule Controller
+
+| Feature              | Method | Endpoint                                  |
+| -------------------- | ------ | ----------------------------------------- |
+| Add Schedule Item    | POST   | `/api/v1/event-schedules/event/{eventId}` |
+| Update Schedule Item | PUT    | `/api/v1/event-schedules/{scheduleId}`    |
+| Delete Schedule Item | DELETE | `/api/v1/event-schedules/{scheduleId}`    |
+| Get Event Schedule   | GET    | `/api/v1/event-schedules/event/{eventId}` |
+
+---
+
+## 🌱 Initiative Controller
+
+| Feature                     | Method | Endpoint                                         |
+| --------------------------- | ------ | ------------------------------------------------ |
+| Get All Initiatives         | GET    | `/api/v1/initiative/get`                         |
+| Create Initiative           | POST   | `/api/v1/initiative/create`                      |
+| Update Initiative           | PUT    | `/api/v1/initiative/update/{id}`                 |
+| Delete Initiative           | DELETE | `/api/v1/initiative/delete/{id}`                 |
+| Get Initiative By ID        | GET    | `/api/v1/initiative/{id}`                        |
+| Get Initiatives By Category | GET    | `/api/v1/initiative/category/{category}`         |
+| Get Upcoming Initiatives    | GET    | `/api/v1/initiative/upcoming`                    |
+| Upload Initiative Image     | POST   | `/api/v1/initiative/{initiativeId}/upload-image` |
+
+---
+
+## 🤝 Initiative Participation Controller
+
+| Feature                           | Method | Endpoint                                                                       |
+| --------------------------------- | ------ | ------------------------------------------------------------------------------ |
+| Get All Initiative Participations | GET    | `/api/v1/initiative-participation/get`                                         |
+| Update Initiative Participation   | PUT    | `/api/v1/initiative-participation/update/{id}`                                 |
+| Delete Initiative Participation   | DELETE | `/api/v1/initiative-participation/delete/{id}`                                 |
+| Join Initiative                   | POST   | `/api/v1/initiative-participation/join/{initiativeId}`                         |
+| Join Family Member                | POST   | `/api/v1/initiative-participation/join-family/{familyMemberId}/{initiativeId}` |
+| Get Initiative Participants       | GET    | `/api/v1/initiative-participation/{initiativeId}/participants`                 |
+
+---
+
+## 💬 Inquiry Controller
+
+| Feature                     | Method | Endpoint                                               |
+| --------------------------- | ------ | ------------------------------------------------------ |
+| Create Announcement Inquiry | POST   | `/api/v1/inquiry/announcement/{announcementId}/create` |
+| Add Message                 | POST   | `/api/v1/inquiry/{inquiryId}/message`                  |
+| Get Inquiry Messages        | GET    | `/api/v1/inquiry/{inquiryId}/messages`                 |
+| Get My Inquiries            | GET    | `/api/v1/inquiry/my-inquiries`                         |
+| Get Received Inquiries      | GET    | `/api/v1/inquiry/received`                             |
+| Resolve Inquiry             | PUT    | `/api/v1/inquiry/{inquiryId}/resolve`                  |
+
+---
+
+## ⭐ Review Controller
+
+| Feature                       | Method | Endpoint                                                  |
+| ----------------------------- | ------ | --------------------------------------------------------- |
+| Get All Reviews               | GET    | `/api/v1/review/get`                                      |
+| Get My Reviews                | GET    | `/api/v1/review/my`                                       |
+| Update Review                 | PUT    | `/api/v1/review/update/{id}`                              |
+| Delete Review                 | DELETE | `/api/v1/review/delete/{id}`                              |
+| Add Event Review              | POST   | `/api/v1/review/add-event-review/{eventId}`               |
+| Add Initiative Review         | POST   | `/api/v1/review/add-initiative-review/{initiativeId}`     |
+| Add Marketplace Seller Review | POST   | `/api/v1/review/marketplace/order-item/{orderItemId}`     |
+| Get Seller Reviews            | GET    | `/api/v1/review/seller/{sellerId}`                        |
+| Get Event Reviews             | GET    | `/api/v1/review/event/{eventId}`                          |
+| Get Initiative Reviews        | GET    | `/api/v1/review/initiative/{initiativeId}`                |
+| Filter Event Reviews          | GET    | `/api/v1/review/event/{eventId}/filter`                   |
+| Get Average Rating            | GET    | `/api/v1/review/average/{eventId}`                        |
+| Get Positive Ratio            | GET    | `/api/v1/review/positive-ratio/{eventId}`                 |
+| Get Event AI Summary          | GET    | `/api/v1/review/ai-summary/{eventId}`                     |
+| Get Initiative Average Rating | GET    | `/api/v1/review/average/initiative/{initiativeId}`        |
+| Get Initiative Positive Ratio | GET    | `/api/v1/review/positive-ratio/initiative/{initiativeId}` |
+
+---
+
+## 🤖 AI Features
+
+| Feature                        | Method | Endpoint                                               |
+| ------------------------------ | ------ | ------------------------------------------------------ |
+| Smart Event Creation           | POST   | `/api/v1/event/create`                                 |
+| Event Recommendation           | GET    | `/api/v1/event/recommend`                              |
+| Announcement Moderation        | POST   | `/api/v1/announcement/moderate/{announcementId}`       |
+| Event Review AI Summary        | GET    | `/api/v1/review/ai-summary/{eventId}`                  |
+| Smart Initiative Participation | POST   | `/api/v1/initiative-participation/join/{initiativeId}` |
+
+
+
+
+---
+
+## 🎫 Ticket Controller
 
 | Feature                    | Method | Endpoint                                        |
 | -------------------------- | ------ | ----------------------------------------------- |
-| Get All Election Rounds    | GET    | `/api/v1/election-rounds/get-all`               |
-| Get Election Round Details | GET    | `/api/v1/election-rounds/get/{roundId}/details` |
-| Create Election Round      | POST   | `/api/v1/election-rounds/add`                   |
-| Update Election Round      | PUT    | `/api/v1/election-rounds/update/{roundId}`      |
-| Delete Election Round      | DELETE | `/api/v1/election-rounds/delete/{roundId}`      |
+| Get Ticket By Registration | GET    | `/api/v1/tickets/registration/{registrationId}` |
+| Check In Ticket            | PUT    | `/api/v1/tickets/check-in/{ticketCode}`         |
 
 ---
-
-## 👨‍👩‍👧 Family Members Controller
-
-| Feature                | Method | Endpoint                                         |
-| ---------------------- | ------ | ------------------------------------------------ |
-| Get All Family Members | GET    | `/api/v1/family-members/get-all`                 |
-| Add Family Member      | POST   | `/api/v1/family-members/add`                     |
-| Update Family Member   | PUT    | `/api/v1/family-members/update/{familyMemberId}` |
-| Delete Family Member   | DELETE | `/api/v1/family-members/delete/{familyMemberId}` |
-
----
-
-## 📍 Landmark Controller
-
-| Feature            | Method | Endpoint                                |
-| ------------------ | ------ | --------------------------------------- |
-| Get All Landmarks  | GET    | `/api/v1/landmarks/get-all`             |
-| Add Landmark       | POST   | `/api/v1/landmarks/add`                 |
-| Update Landmark    | PUT    | `/api/v1/landmarks/update/{landmarkId}` |
-| Delete Landmark    | DELETE | `/api/v1/landmarks/delete/{landmarkId}` |
-| Sync Landmarks     | POST   | `/api/v1/landmarks/sync`                |
-| Nearby Landmarks   | GET    | `/api/v1/landmarks/nearby`              |
-| Landmark Dashboard | GET    | `/api/v1/landmarks/dashboard`           |
-
----
-
-## 👑 Mayor Candidate Controller
-
-| Feature                 | Method | Endpoint                                             |
-| ----------------------- | ------ | ---------------------------------------------------- |
-| Get All Candidates      | GET    | `/api/v1/mayor-candidates/get-all`                   |
-| Apply For Candidacy     | POST   | `/api/v1/mayor-candidates/apply/round/{roundId}`     |
-| Get Candidates By Round | GET    | `/api/v1/mayor-candidates/round/{roundId}`           |
-| Election Dashboard      | GET    | `/api/v1/mayor-candidates/round/{roundId}/dashboard` |
-| Candidate Profile       | GET    | `/api/v1/mayor-candidates/profile/{candidateId}`     |
-| Update Candidate        | PUT    | `/api/v1/mayor-candidates/update/{candidateId}`      |
-| Delete Candidate        | DELETE | `/api/v1/mayor-candidates/delete/{candidateId}`      |
-
----
-
-## 🏛 Mayor Profile Controller
-
-| Feature                | Method | Endpoint                             |
-| ---------------------- | ------ | ------------------------------------ |
-| Get All Mayor Profiles | GET    | `/api/v1/mayor-profile/get-all`      |
-| Add Mayor Profile      | POST   | `/api/v1/mayor-profile/add`          |
-| Update Mayor Profile   | PUT    | `/api/v1/mayor-profile/update/{id}`  |
-| Delete Mayor Profile   | DELETE | `/api/v1/mayor-profile/delete/{id}`  |
-| Analytics              | GET    | `/api/v1/mayor-profile/analytics`    |
-| Reports                | GET    | `/api/v1/mayor-profile/reports`      |
-| Weekly Report          | GET    | `/api/v1/mayor-profile/weekly`       |
-| Performance Report     | GET    | `/api/v1/mayor-profile/performance`  |
-| Satisfaction Report    | GET    | `/api/v1/mayor-profile/satisfaction` |
-| Initiative Suggestions | GET    | `/api/v1/mayor-profile/initiative-suggestions` |
-
----
-
-## 🗳 Mayor Vote Controller
-
-| Feature            | Method | Endpoint                                                           |
-| ------------------ | ------ | ------------------------------------------------------------------ |
-| Get All Votes      | GET    | `/api/v1/mayor-votes/get-all`                                      |
-| Vote For Candidate | POST   | `/api/v1/mayor-votes/vote/candidate/{candidateId}/round/{roundId}` |
-| Delete Vote        | DELETE | `/api/v1/mayor-votes/delete/{voteId}`                              |
-
----
-
-## 🏘 Neighborhood Controller
-
-| Feature                | Method | Endpoint                                        |
-| ---------------------- | ------ | ----------------------------------------------- |
-| Get All Neighborhoods  | GET    | `/api/v1/neighborhoods/get-all`                 |
-| Add Neighborhood       | POST   | `/api/v1/neighborhoods/add`                     |
-| Update Neighborhood    | PUT    | `/api/v1/neighborhoods/update/{neighborhoodId}` |
-| Delete Neighborhood    | DELETE | `/api/v1/neighborhoods/delete/{neighborhoodId}` |
-| Neighborhood Dashboard | GET    | `/api/v1/neighborhoods/dashboard`               |
-
----
-
-## 👤 User Controller
-
-| Feature                | Method | Endpoint                                   |
-| ---------------------- | ------ | ------------------------------------------ |
-| Get All Users          | GET    | `/api/v1/users/get-all`                    |
-| Add User               | POST   | `/api/v1/users/add`                        |
-| Update User            | PUT    | `/api/v1/users/update/{userId}`            |
-| Delete User            | DELETE | `/api/v1/users/delete/{userId}`            |
-| Welcome Page           | GET    | `/api/v1/users/welcome`                    |
-| About Page             | GET    | `/api/v1/users/about`                      |
-| Contact                | POST   | `/api/v1/users/contact`                    |
-| Neighborhood Residents | GET    | `/api/v1/users/neighborhood-residents`     |
-| Activity Log           | GET    | `/api/v1/users/activity-log`               |
-| Full Profile           | GET    | `/api/v1/users/profile/full`               |
-| Basic Profile          | GET    | `/api/v1/users/profile/basic`              |
-| Family Profile         | GET    | `/api/v1/users/profile/family`             |
-| Votes Profile          | GET    | `/api/v1/users/profile/votes`              |
-| Events Profile         | GET    | `/api/v1/users/profile/events`             |
-| Reviews Profile        | GET    | `/api/v1/users/profile/reviews`            |
-| Issues Profile         | GET    | `/api/v1/users/profile/issues`             |
-| Marketplace Summary    | GET    | `/api/v1/users/marketplace/summary`        |
-| My Orders              | GET    | `/api/v1/users/marketplace/my-orders`      |
-| Product Orders         | GET    | `/api/v1/users/marketplace/product-orders` |
-| Inquirie Profile       | GET    | `/api/v1/inquiry/my-inquiries`             |
 
 ---
 
