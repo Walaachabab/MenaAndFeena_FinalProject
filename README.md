@@ -34,6 +34,10 @@ http://menaandfeena-env.eba-dsbymcfp.eu-central-1.elasticbeanstalk.com/api/v1/us
 
 https://github.com/Reenad1424/MenaAndFeena_FinalProject/blob/main/API%20documentation.postman_collection%20(1).json
 
+# 🎨 Figma Design:
+
+https://www.figma.com/design/e3KckUskVxFWFs5o5K72JD/%D9%85%D9%86%D9%8B%D8%A7-%D9%88%D9%81%D9%8A%D9%86%D8%A7?node-id=0-1&t=orEb4zsaxuzTMBDy-1
+
 
 ## 🛠 Technologies Used
 
