@@ -200,6 +200,7 @@ https://www.figma.com/design/e3KckUskVxFWFs5o5K72JD/%D9%85%D9%86%D9%8B%D8%A7-%D9
 | Marketplace Summary    | GET    | `/api/v1/users/marketplace/summary`        |
 | My Orders              | GET    | `/api/v1/users/marketplace/my-orders`      |
 | Product Orders         | GET    | `/api/v1/users/marketplace/product-orders` |
+| Inquirie Profile       | GET    | `/api/v1/inquiry/my-inquiries`             |
 
 ---
 
