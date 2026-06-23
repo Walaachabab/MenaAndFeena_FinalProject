@@ -207,6 +207,15 @@ https://www.figma.com/design/e3KckUskVxFWFs5o5K72JD/%D9%85%D9%86%D9%8B%D8%A7-%D9
 
 ---
 
+## 🎫 Ticket Controller
+
+| Feature                    | Method | Endpoint                                        |
+| -------------------------- | ------ | ----------------------------------------------- |
+| Get Ticket By Registration | GET    | `/api/v1/tickets/registration/{registrationId}` |
+| Check In Ticket            | PUT    | `/api/v1/tickets/check-in/{ticketCode}`         |
+
+---
+
 ## 🤖 AI Features
 
 | Feature                        | Method | Endpoint                                               |
@@ -216,20 +225,6 @@ https://www.figma.com/design/e3KckUskVxFWFs5o5K72JD/%D9%85%D9%86%D9%8B%D8%A7-%D9
 | Announcement Moderation        | POST   | `/api/v1/announcement/moderate/{announcementId}`       |
 | Event Review AI Summary        | GET    | `/api/v1/review/ai-summary/{eventId}`                  |
 | Smart Initiative Participation | POST   | `/api/v1/initiative-participation/join/{initiativeId}` |
-
-
-
-
----
-
-## 🎫 Ticket Controller
-
-| Feature                    | Method | Endpoint                                        |
-| -------------------------- | ------ | ----------------------------------------------- |
-| Get Ticket By Registration | GET    | `/api/v1/tickets/registration/{registrationId}` |
-| Check In Ticket            | PUT    | `/api/v1/tickets/check-in/{ticketCode}`         |
-
----
 
 ---
 
