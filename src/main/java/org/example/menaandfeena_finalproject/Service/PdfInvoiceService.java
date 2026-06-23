@@ -30,7 +30,7 @@ public class PdfInvoiceService {
         return generateInvoicePdf(invoice);
     }
 
-    private byte[] generateInvoicePdf(PaymentInvoiceDTO invoice) throws Exception {
+    public static byte[] generateInvoicePdf(PaymentInvoiceDTO invoice) throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         PdfRendererBuilder builder = new PdfRendererBuilder();
@@ -53,7 +53,7 @@ public class PdfInvoiceService {
         return out.toByteArray();
     }
 
-    private String buildInvoiceHtml(PaymentInvoiceDTO invoice) throws Exception {
+    private static String buildInvoiceHtml(PaymentInvoiceDTO invoice) throws Exception {
         byte[] logoBytes = StreamUtils.copyToByteArray(
                 new ClassPathResource("static/images/logo.jpeg").getInputStream()
         );
@@ -194,6 +194,10 @@ table.details td {
         <span class="status-badge">%s</span>
 
         <table class="details">
+            <tr><th>Event date</th><td>%s</td></tr>
+            <tr><th>Event time</th><td>%s</td></tr>
+            <tr><th>Event location</th><td>%s</td></tr>
+            <tr><th>Ticket status</th><td>%s</td></tr>
             <tr><th>رقم العملية</th><td>%s</td></tr>
             <tr><th>الفعالية</th><td>%s</td></tr>
             <tr><th>المبلغ</th><td>%s</td></tr>
@@ -210,6 +214,10 @@ table.details td {
 """.formatted(
                 logoSrc,
                 html(status),
+                html(invoice.getEventDate()),
+                html(invoice.getEventTime()),
+                html(invoice.getEventLocation()),
+                html(invoice.getTicketStatus()),
                 html(invoice.getMoyasarPaymentId()),
                 html(invoice.getEventTitle()),
                 html(invoice.getAmount()),
@@ -219,7 +227,7 @@ table.details td {
         );
     }
 
-    private String html(Object value) {
+    private static String html(Object value) {
         if (value == null) {
             return "لا يوجد";
         }

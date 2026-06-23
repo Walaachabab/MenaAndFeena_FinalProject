@@ -43,7 +43,20 @@ public class NeighborhoodService {
     // =========================
 
     public List<Neighborhood> getAllNeighborhoods() {
-        return neighborhoodRepository.findAll();
+        List<Neighborhood> neighborhoods = neighborhoodRepository.findAll();
+
+        // نملأ عدد السكان المقدّر بالذكاء الاصطناعي لأي حي قيمته null (best-effort) ونحفظه حتى لا يبقى null.
+        for (Neighborhood neighborhood : neighborhoods) {
+            if (neighborhood.getEstimatedPopulation() == null) {
+                Integer estimated = estimatePopulationByAI(neighborhood.getName(), neighborhood.getCity());
+                if (estimated != null) {
+                    neighborhood.setEstimatedPopulation(estimated);
+                    neighborhoodRepository.save(neighborhood);
+                }
+            }
+        }
+
+        return neighborhoods;
     }
 
 
@@ -55,7 +68,11 @@ public class NeighborhoodService {
         Neighborhood neighborhood = new Neighborhood();
         neighborhood.setName(dto.getName());
         neighborhood.setCity(dto.getCity());
-        neighborhood.setEstimatedPopulation(dto.getEstimatedPopulation());
+        // إن لم يُرسل المدير عدد السكان المقدّر، نقدّره بالذكاء الاصطناعي حتى لا يكون null.
+        Integer estimatedPopulation = dto.getEstimatedPopulation() != null
+                ? dto.getEstimatedPopulation()
+                : estimatePopulationByAI(dto.getName(), dto.getCity());
+        neighborhood.setEstimatedPopulation(estimatedPopulation);
         neighborhood.setRegisteredPopulation(0);
         neighborhood.setLatitude(dto.getLatitude());
         neighborhood.setLongitude(dto.getLongitude());
@@ -320,6 +337,39 @@ public class NeighborhoodService {
         }
     }
 
+
+    // يقدّر عدد سكان الحي بالذكاء الاصطناعي اعتماداً على الاسم والمدينة.
+    // best-effort: يرجع null عند أي فشل (لا يكسر إنشاء الحي أو جلب القائمة).
+    public Integer estimatePopulationByAI(String name, String city) {
+        try {
+            String prompt = """
+                    Return ONLY valid JSON. No markdown. No explanation.
+                    Estimate the population for this neighborhood using its name and city.
+                    Neighborhood: %s
+                    City: %s
+                    Required JSON format:
+                    {"estimatedPopulation": number}
+                    """.formatted(name, city);
+
+            String aiResponse = openAIService.askAI("You are a smart city population data analyst.", prompt);
+            if (aiResponse == null || aiResponse.isBlank() || aiResponse.contains("ERROR")) {
+                return null;
+            }
+
+            String json = aiResponse.trim();
+            if (json.startsWith("```")) {
+                json = json.replace("```json", "").replace("```", "").trim();
+            }
+
+            JsonNode node = new ObjectMapper().readTree(json);
+            if (node.has("estimatedPopulation") && !node.get("estimatedPopulation").isNull()) {
+                return node.get("estimatedPopulation").asInt();
+            }
+            return null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
     // =========================
     // HELPERS

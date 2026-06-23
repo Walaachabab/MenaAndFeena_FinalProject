@@ -20,6 +20,7 @@ import org.example.menaandfeena_finalproject.Repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -193,6 +194,20 @@ public class ReviewService {
                 .stream()
                 .map(this::convertToOutDTO)
                 .toList();
+    }
+
+    // تقييماتي: التقييمات التي كتبها المستخدم نفسه (لعرضها في صفحة الملف الشخصي).
+    public List<ReviewOutDTO> getMyReviews(Integer userId) {
+        User user = userRepository.findUserById(userId);
+        if (user == null) {
+            throw new ApiException("User not found");
+        }
+
+        List<ReviewOutDTO> myReviews = new ArrayList<>();
+        for (Review review : reviewRepository.findByUserId(userId)) {
+            myReviews.add(convertToOutDTO(review));
+        }
+        return myReviews;
     }
 
 

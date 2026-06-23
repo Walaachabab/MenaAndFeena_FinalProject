@@ -12,6 +12,7 @@ import org.example.menaandfeena_finalproject.Repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -29,6 +30,19 @@ public class AnnouncementService {
                 .stream()
                 .map(this::convertToOutDTO)
                 .toList();
+    }
+
+    public List<AnnouncementOutDTO> getMyAnnouncements(Integer userId) {
+        User user = userRepository.findUserById(userId);
+        if (user == null) {
+            throw new ApiException("User not found");
+        }
+
+        List<AnnouncementOutDTO> myAnnouncements = new ArrayList<>();
+        for (Announcement announcement : announcementRepository.findByUserId(userId)) {
+            myAnnouncements.add(convertToOutDTO(announcement));
+        }
+        return myAnnouncements;
     }
 
     public void updateAnnouncement(Integer id, Integer userId, AnnouncementInDTO announcementInDTO) {

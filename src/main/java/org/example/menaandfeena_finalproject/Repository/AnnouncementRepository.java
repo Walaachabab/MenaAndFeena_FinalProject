@@ -10,5 +10,6 @@ import java.util.List;
 public interface AnnouncementRepository extends JpaRepository<Announcement, Integer> {
     Announcement findAnnouncementById(Integer id);
     List<Announcement> findByTitleContainingIgnoreCase(String keyword);
+    List<Announcement> findByUserId(Integer userId);
 
 }

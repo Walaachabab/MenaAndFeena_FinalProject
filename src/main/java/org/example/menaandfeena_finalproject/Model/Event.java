@@ -4,6 +4,7 @@ package org.example.menaandfeena_finalproject.Model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -90,8 +91,10 @@ public class Event {
     private Neighborhood neighborhood;
 
 
+    // في الرد JSON نُظهر فقط معرّف واسم المنشئ بدل بيانات المستخدم كاملة.
     @ManyToOne
     @JoinColumn(name = "creator_id")
+    @JsonIncludeProperties({"id", "fullName"})
     private User creator;
 
 

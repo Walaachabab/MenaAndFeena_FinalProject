@@ -3,6 +3,7 @@ package org.example.menaandfeena_finalproject.Service;
 import lombok.RequiredArgsConstructor;
 import org.example.menaandfeena_finalproject.Api.ApiException;
 import org.example.menaandfeena_finalproject.DTO.In.InitiativeParticipationInDTO;
+import org.example.menaandfeena_finalproject.DTO.Out.InitiativeParticipantOutDTO;
 import org.example.menaandfeena_finalproject.Model.FamilyMember;
 import org.example.menaandfeena_finalproject.Model.Initiative;
 import org.example.menaandfeena_finalproject.Model.InitiativeParticipation;
@@ -225,6 +226,33 @@ public List<InitiativeParticipation> getParticipants(Integer initiativeId) { //Ø
     }
 
     return initiativeParticipationRepository.findByInitiative_Id(initiativeId);
+}
+
+public List<InitiativeParticipantOutDTO> getParticipantDetails(Integer initiativeId) {
+
+    Initiative initiative = initiativeRepository.findInitiativeById(initiativeId);
+    if (initiative == null) {
+        throw new ApiException("Initiative not found");
+    }
+
+    return initiativeParticipationRepository.findByInitiative_Id(initiativeId)
+            .stream()
+            .map(this::convertToParticipantOutDTO)
+            .toList();
+}
+
+private InitiativeParticipantOutDTO convertToParticipantOutDTO(InitiativeParticipation participation) {
+    User user = participation.getUser();
+
+    return new InitiativeParticipantOutDTO(
+            participation.getId(),
+            participation.getStatus(),
+            participation.getJoinedAt(),
+            user == null ? null : user.getId(),
+            user == null ? null : user.getFullName(),
+            user == null ? null : user.getEmail(),
+            user == null ? null : user.getPhone()
+    );
 }
 
 

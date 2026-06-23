@@ -22,6 +22,13 @@ public class AnnouncementController {
         return ResponseEntity.status(200).body(announcementService.getAllAnnouncements());
     }
 
+    // إعلانات المستخدم الحالي (صفحة الملف الشخصي: "إعلاناتي").
+    @GetMapping("/my")
+    public ResponseEntity<?> getMyAnnouncements(Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        return ResponseEntity.status(200).body(announcementService.getMyAnnouncements(user.getId()));
+    }
+
 //    @PutMapping("/update/{id}/{userId}")
 //    public ResponseEntity<?> updateAnnouncement(@PathVariable Integer id, @PathVariable Integer userId, @Valid @RequestBody AnnouncementInDTO announcementInDTO) {
 //

@@ -22,6 +22,14 @@ import lombok.Setter;
 
         private String eventTitle;
 
+        private String eventDate;
+
+        private String eventTime;
+
+        private String eventLocation;
+
+        private String ticketStatus;
+
         private String amount;
 
         private String currency;

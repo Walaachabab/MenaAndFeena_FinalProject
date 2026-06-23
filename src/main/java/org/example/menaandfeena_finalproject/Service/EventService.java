@@ -504,13 +504,14 @@ public class EventService {
         String aiRecommendation = openAIService.askAI(
                 "You are an AI event recommendation system for a smart neighborhood platform. " +
                         "Recommend one suitable event for EACH family member individually based on their age and relation. " +
-                        "Use these age groups exactly: children = age 0 to 12, teenagers = age 13 to 18, adults = age 19 and above. " +
+                        "Age groups by age: 0-12 = أطفال, 13-18 = مراهقون, 19+ = بالغون. " +
                         "Children prefer drawing, games, entertainment, and educational activities. " +
                         "Teenagers prefer sports, technology, competitions, and skill-building activities. " +
                         "Adults prefer community, cultural, educational, and social activities. " +
                         "Choose only from the available events list. " +
+                        "ALL text values (ageGroup and reason) MUST be written in Arabic. Keep the reason short. " +
                         "Return STRICT JSON only, no markdown, as an array with this exact shape:\n" +
-                        "[{\"familyMemberName\":\"...\",\"ageGroup\":\"children|teenagers|adults\",\"recommendedEvent\":\"event title\",\"reason\":\"short reason\"}]",
+                        "[{\"familyMemberName\":\"...\",\"ageGroup\":\"أطفال|مراهقون|بالغون\",\"recommendedEvent\":\"عنوان الفعالية\",\"reason\":\"سبب قصير بالعربية\"}]",
                 prompt.toString()
         );
 
@@ -644,12 +645,13 @@ public class EventService {
                 Build a practical weekend plan using only the provided events and initiatives.
                 Rules:
                 - The "activity" values must be the event/initiative titles exactly as provided.
-                - The "reason" values are short and written in a friendly Arabic tone.
-                - Include a Friday plan and a Saturday plan (each can have Morning and/or Evening items).
+                - ALL text you write ("period", "reason", and "notes") MUST be in Arabic, in a friendly tone.
+                - Use Arabic for the period: "صباحاً" for morning and "مساءً" for evening.
+                - Include a Friday plan and a Saturday plan (each can have a morning and/or evening item).
                 - Do not invent activities, locations, prices, or dates.
                 - If there are not enough activities, return a lighter plan instead of inventing.
                 Return STRICT JSON only, no markdown, with this exact shape:
-                {"friday":[{"period":"Morning","activity":"...","reason":"..."}],"saturday":[{"period":"Evening","activity":"...","reason":"..."}],"notes":["short practical note"]}
+                {"friday":[{"period":"صباحاً","activity":"...","reason":"سبب قصير بالعربية"}],"saturday":[{"period":"مساءً","activity":"...","reason":"سبب قصير بالعربية"}],"notes":["ملاحظة قصيرة بالعربية"]}
                 """,
                 prompt.toString()
         );

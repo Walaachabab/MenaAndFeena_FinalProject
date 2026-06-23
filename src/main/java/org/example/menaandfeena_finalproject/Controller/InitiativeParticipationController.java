@@ -91,7 +91,7 @@ public class InitiativeParticipationController {
 
     @GetMapping("/{initiativeId}/participants")
     public ResponseEntity<?> getParticipants(@PathVariable Integer initiativeId) {
-        return ResponseEntity.status(200).body(initiativeParticipationService.getParticipants(initiativeId));
+        return ResponseEntity.status(200).body(initiativeParticipationService.getParticipantDetails(initiativeId));
     }
 
 

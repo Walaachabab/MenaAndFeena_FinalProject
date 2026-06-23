@@ -10,8 +10,11 @@ import org.example.menaandfeena_finalproject.DTO.Out.PaymentOutDTO;
 import org.example.menaandfeena_finalproject.Model.Event;
 import org.example.menaandfeena_finalproject.Model.EventRegistration;
 import org.example.menaandfeena_finalproject.Model.Payment;
+import org.example.menaandfeena_finalproject.Model.User;
 import org.example.menaandfeena_finalproject.Repository.EventRegistrationRepository;
 import org.example.menaandfeena_finalproject.Repository.PaymentRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -22,14 +25,22 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
+    private static final Logger log = LoggerFactory.getLogger(PaymentService.class);
+    private static final DateTimeFormatter EVENT_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter EVENT_TIME_FORMATTER = DateTimeFormatter.ofPattern("h:mm a");
+
     private final EventRegistrationRepository eventRegistrationRepository;
     private final TicketService ticketService;
+    private final EmailService emailService;
+    private final WhatsAppService whatsAppService;
     @Value("${moyasar.api.key}")
 
     private String apiKey;
@@ -236,6 +247,7 @@ public class PaymentService {
             registration.setStatus("CONFIRMED");
             EventRegistration savedRegistration = eventRegistrationRepository.save(registration);
             ticketService.createTicketIfMissing(savedRegistration);
+            trySendEventInvoice(payment);
         }
 
         return result;
@@ -253,6 +265,7 @@ public class PaymentService {
         }
 
         if (status.equalsIgnoreCase("paid")) {
+            boolean newlyPaid = !"PAID".equalsIgnoreCase(payment.getStatus());
 
             payment.setStatus("PAID");
             paymentRepository.save(payment);
@@ -263,6 +276,10 @@ public class PaymentService {
                 registration.setStatus("CONFIRMED");
                 EventRegistration savedRegistration = eventRegistrationRepository.save(registration);
                 ticketService.createTicketIfMissing(savedRegistration);
+            }
+
+            if (newlyPaid) {
+                trySendEventInvoice(payment);
             }
 
         } else {
@@ -303,9 +320,31 @@ public class PaymentService {
             Payment payment = paymentRepository.findPaymentByTransactionId(paymentId);
 
             String eventTitle = null;
+            String eventDate = null;
+            String eventTime = null;
+            String eventLocation = null;
+            String ticketStatus = null;
 
             if (payment != null && payment.getEventRegistration() != null) {
-                eventTitle = payment.getEventRegistration().getEvent().getTitle();
+                EventRegistration registration = payment.getEventRegistration();
+                Event event = registration.getEvent();
+                ticketStatus = registration.getStatus();
+
+                if (event != null) {
+                    eventTitle = event.getTitle();
+                    eventLocation = event.getLocation();
+
+                    if (event.getDate() != null) {
+                        eventDate = event.getDate().format(EVENT_DATE_FORMATTER);
+                        eventTime = event.getDate().format(EVENT_TIME_FORMATTER);
+                    }
+
+                    if (event.getDate() != null && event.getEndTime() != null) {
+                        eventTime = event.getDate().format(EVENT_TIME_FORMATTER) +
+                                " - " +
+                                event.getEndTime().format(EVENT_TIME_FORMATTER);
+                    }
+                }
             }
 
             return new PaymentInvoiceDTO(
@@ -315,6 +354,10 @@ public class PaymentService {
                     node.path("description").asText(),
 
                     eventTitle, // eventTitle
+                    eventDate,
+                    eventTime,
+                    eventLocation,
+                    ticketStatus,
 
                     node.path("amount_format").asText(),
                     node.path("currency").asText(),
@@ -354,6 +397,61 @@ public class PaymentService {
         }
 
         return getPaymentInvoice(paymentId);
+    }
+
+    private void trySendEventInvoice(Payment payment) {
+        try {
+            if (payment == null || payment.getEventRegistration() == null) {
+                return;
+            }
+
+            EventRegistration registration = payment.getEventRegistration();
+            User user = registration.getUser();
+            Event event = registration.getEvent();
+            if (user == null) {
+                return;
+            }
+
+            PaymentInvoiceDTO invoice = getPaymentInvoice(payment.getTransactionId());
+            byte[] invoicePdf = PdfInvoiceService.generateInvoicePdf(invoice);
+            String fileName = "event-invoice-" + payment.getTransactionId() + ".pdf";
+            String eventTitle = event == null ? "your event" : event.getTitle();
+
+            if (user.getEmail() != null && !user.getEmail().isBlank()) {
+                emailService.sendEmailWithAttachment(
+                        user.getEmail(),
+                        "Mena And Feena Event Invoice - " + eventTitle,
+                        "Thank you for your event payment. Your invoice is attached.",
+                        invoicePdf,
+                        fileName
+                );
+            }
+
+            if (user.getPhone() != null && !user.getPhone().isBlank()) {
+                String documentBase64 = "data:application/pdf;base64," + Base64.getEncoder().encodeToString(invoicePdf);
+                String caption =
+                        "Mena And Feena event invoice\n\n" +
+                                "Event: " + eventTitle + "\n" +
+                                "Date: " + invoiceValue(invoice.getEventDate()) + "\n" +
+                                "Time: " + invoiceValue(invoice.getEventTime()) + "\n" +
+                                "Location: " + invoiceValue(invoice.getEventLocation()) + "\n" +
+                                "Ticket status: " + invoiceValue(invoice.getTicketStatus());
+
+                whatsAppService.sendWhatsAppDocument(
+                        user.getPhone(),
+                        fileName,
+                        documentBase64,
+                        caption
+                );
+            }
+        } catch (Exception e) {
+            Integer paymentId = payment == null ? null : payment.getId();
+            log.error("Event invoice delivery failed for payment id {}. Payment and registration updates were kept.", paymentId, e);
+        }
+    }
+
+    private String invoiceValue(String value) {
+        return value == null || value.isBlank() ? "Not available" : value;
     }
 
 }

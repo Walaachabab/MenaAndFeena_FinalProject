@@ -21,6 +21,13 @@ public class ReviewController {
         return ResponseEntity.status(200).body(reviewService.getAllReviews());
     }
 
+    // تقييماتي (صفحة الملف الشخصي: "تقييماتي").
+    @GetMapping("/my")
+    public ResponseEntity<?> getMyReviews(Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        return ResponseEntity.status(200).body(reviewService.getMyReviews(user.getId()));
+    }
+
 
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateReview(@PathVariable Integer id, @Valid @RequestBody ReviewInDTO reviewInDTO) {
