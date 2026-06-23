@@ -28,10 +28,7 @@ https://github.com/Reenad1424/MenaAndFeena_FinalProject/blob/main/image.png
 
 ## 🚀 Deployment
 
-**Deployment URL:**
-*Add Deployment Link Here*
-
----
+http://menaandfeena-env.eba-dsbymcfp.eu-central-1.elasticbeanstalk.com/api/v1/users/welcome
 
 ## 📮 API Documentation
 
