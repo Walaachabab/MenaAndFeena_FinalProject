@@ -23,7 +23,7 @@ The platform also provides a community marketplace for buying, renting, and exch
 
 ### Use Case Diagram
 
-![Class Diagram](https://github.com/Reenad1424/MenaAndFeena_FinalProject/blob/main/image.png)
+![Class Diagram](MenaAndFeena.drawio (1).png)
 
 
 ## 🚀 Deployment
